@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #0e0c09;
+  --color-charcoal: #1c1712;
+  --color-steel: #332c24;
+  --color-bone: #f4ede0;
+  --color-putty: #9a9182;
+  --color-neon: #ff5a1f;
+  --color-tungsten: #ffb443;
+  --color-argon: #7fd6e8;
+
+  --font-display: "Big Shoulders", sans-serif;
+  --font-body: "Archivo", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+html {
+  background: var(--color-ink);
+  color: var(--color-bone);
+  font-family: var(--font-body);
+  scroll-behavior: auto;
+  scrollbar-color: var(--color-steel) var(--color-ink);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-ink);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-steel);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-tungsten);
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-neon);
+  color: var(--color-ink);
+}
+
+.magnetic-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.magnetic-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.32) 50%,
+    transparent 58%
+  );
+  transform: translateX(-130%);
+  transition: transform 0.55s ease;
+  pointer-events: none;
+}
+
+.magnetic-shine:hover::after {
+  transform: translateX(130%);
+}
+
+.loader-s {
+  text-shadow:
+    0 0 18px rgba(255, 90, 31, 0.55),
+    0 0 44px rgba(255, 90, 31, 0.25);
+  animation: neon-flicker 1.7s infinite;
+}
+
+@keyframes neon-flicker {
+  0%,
+  86%,
+  92%,
+  97%,
+  100% {
+    opacity: 1;
+  }
+  89% {
+    opacity: 0.3;
+  }
+  95% {
+    opacity: 0.55;
+  }
+}
