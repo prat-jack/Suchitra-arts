@@ -63,6 +63,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
     sceneRef.current = scene
     let disposed = false
     let tl: gsap.core.Timeline | null = null
+    let heroSt: ScrollTrigger | null = null
     let tick: ((time: number, dt: number) => void) | null = null
     let onResize: (() => void) | null = null
     let onMove: ((e: PointerEvent) => void) | null = null
@@ -195,7 +196,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
         tl.eventCallback('onComplete', () => scene.setIdle(true))
         gsap.delayedCall(1.5, () => tl?.play())
       } else {
-        const st = ScrollTrigger.create({
+        const st = (heroSt = ScrollTrigger.create({
           trigger: section,
           start: 'top top',
           end: '+=4200',
@@ -208,7 +209,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
             updateHud(self.progress)
             updateSound(self.progress, self.getVelocity())
           },
-        })
+        }))
         tl.eventCallback('onComplete', () => scene.setIdle(true))
         st.refresh()
         scrollEndRef.current = st.start + 4200
@@ -260,7 +261,8 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
       if (onResize) window.removeEventListener('resize', onResize)
       if (onMove) canvas.removeEventListener('pointermove', onMove)
       if (onClick) canvas.removeEventListener('click', onClick as EventListener)
-      ScrollTrigger.getAll().forEach((s) => s.kill())
+      // Kill only the hero's own trigger — other sections manage theirs
+      heroSt?.kill()
       tl?.kill()
       soundRef.current?.dispose()
       soundRef.current = null

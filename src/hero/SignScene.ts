@@ -713,11 +713,20 @@ export class SignScene {
 
   setIdle(active: boolean): void {
     if (!active && !this.signOn) {
-      // Leaving the settled frame re-enters the scroll story; the scrub owns
-      // light state there, so a user-toggled "off" resets
+      // Leaving the settled frame re-enters the scroll story. The scrub only
+      // writes these values when its playhead crosses their tweens (all of
+      // which sit below ~82%), so a user-toggled "off" state would otherwise
+      // stick — restore the timeline's end-state explicitly.
       this.signOn = true
       this.toggleTweens.forEach((t) => t.kill())
       this.toggleTweens = []
+      for (const letter of this.sign.letters) letter.glow.v = EMISSIVE_ON
+      this.argonGlow.v = 0.55
+      this.lampLevel.v = 40
+      this.signLight.intensity = 12
+      this.bloomPass.strength = 0.3
+      this.lever.rotation.z = -0.7
+      this.leverMat.emissiveIntensity = 0.9
     }
     this.idle = active
   }
