@@ -183,6 +183,27 @@ body {
   }
 }
 
+/* Process: sticky numeral swaps with a mask-rise on each step change */
+.proc-numeral {
+  animation: proc-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  text-shadow: 0 0 24px rgba(255, 90, 31, 0.18);
+}
+
+@keyframes proc-rise {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .proc-numeral {
+    animation: none;
+  }
+}
+
 .magnetic-shine {
   position: relative;
   overflow: hidden;
