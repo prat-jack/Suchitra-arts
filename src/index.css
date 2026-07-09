@@ -50,6 +50,12 @@ body {
   color: var(--color-ink);
 }
 
+:focus-visible {
+  outline: 2px solid var(--color-tungsten);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
 /* Services: every title is a sign sample — unlit outline until it ignites */
 .svc-title {
   color: transparent;

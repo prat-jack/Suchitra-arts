@@ -107,6 +107,11 @@ export class SignScene {
   private blinkAt = 5
   private canvas: HTMLCanvasElement
 
+  // FPS governor: exponential moving average of frame time; downgrade-only
+  private fpsEma = 60
+  private slowSince = -1
+  private qualityTier = 0
+
   private breaker!: THREE.Mesh
   private signOn = true
   private contactAts: number[] = []
@@ -153,7 +158,9 @@ export class SignScene {
     this.buildEnvironment()
     this.buildRig()
 
-    const ttf = await new TTFLoader().loadAsync('/fonts/BigShoulders-ExtraBold.ttf')
+    const ttf = await new TTFLoader().loadAsync(
+      `${import.meta.env.BASE_URL}fonts/BigShoulders-ExtraBold.ttf`,
+    )
     const font = new Font(ttf)
     const signGroup = new THREE.Group()
     this.scene.add(signGroup)
@@ -791,7 +798,32 @@ export class SignScene {
     this.shake = Math.max(this.shake, amount)
   }
 
+  /** If a machine can't hold ~45fps, quietly shed quality instead of janking.
+   *  Downgrade-only with a 2s confirmation window so it never oscillates. */
+  private govern(dt: number): void {
+    if (dt <= 0 || dt > 0.5 || this.qualityTier >= 2) return
+    this.fpsEma += (1 / dt - this.fpsEma) * 0.05
+    if (this.fpsEma < 45) {
+      if (this.slowSince < 0) this.slowSince = this.elapsed
+      if (this.elapsed - this.slowSince > 2) {
+        this.qualityTier += 1
+        this.slowSince = -1
+        this.fpsEma = 60
+        if (this.qualityTier === 1) {
+          this.renderer.setPixelRatio(1)
+          this.composer.setPixelRatio(1)
+          this.resize(this.canvas.clientWidth, this.canvas.clientHeight)
+        } else {
+          this.bloomPass.enabled = false
+        }
+      }
+    } else {
+      this.slowSince = -1
+    }
+  }
+
   render(dt: number): void {
+    this.govern(dt)
     this.elapsed += dt
     this.dust.rotation.y = this.elapsed * 0.016
     this.dust.position.y = Math.sin(this.elapsed * 0.35) * 0.06
@@ -806,7 +838,7 @@ export class SignScene {
       this.lamp.intensity < 25 ? 0.5 + 0.4 * Math.sin(this.elapsed * 2.6) : 0.95
 
     if (this.reflector && this.reflectorCover) {
-      this.reflector.visible = this.idleW > 0.01
+      this.reflector.visible = this.qualityTier < 2 && this.idleW > 0.01
       const coverMat = this.reflectorCover.material as THREE.MeshStandardMaterial
       coverMat.opacity = 1 - this.idleW * 0.72
     }

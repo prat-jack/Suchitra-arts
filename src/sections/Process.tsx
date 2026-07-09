@@ -135,6 +135,7 @@ export default function Process() {
       className="relative bg-ink bg-[radial-gradient(640px_220px_at_50%_0%,rgba(127,214,232,0.05),transparent_70%)] py-28 md:py-40"
     >
       <div className="px-6 md:px-12 lg:px-20">
+        <h2 className="sr-only">How we work</h2>
         <p className="font-mono text-[11px] tracking-[0.24em] text-putty">
           HOW WE WORK — FROM DRAWING TO GLOW
         </p>

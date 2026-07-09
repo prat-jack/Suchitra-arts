@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://prat-jack.github.io/Suchitra-arts/sitemap.xml

@@ -125,6 +125,7 @@ export default function Services() {
       className="relative bg-ink bg-[radial-gradient(720px_240px_at_50%_0%,rgba(255,90,31,0.08),transparent_70%)] py-28 md:py-40"
     >
       <div className="px-6 md:px-12 lg:px-20">
+        <h2 className="sr-only">What we make</h2>
         <p className="font-mono text-[11px] tracking-[0.24em] text-putty">
           WHAT WE MAKE — FOUR WAYS TO BE SEEN
         </p>

@@ -272,7 +272,12 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
 
   return (
     <section ref={sectionRef} className="relative h-screen w-full overflow-hidden bg-ink">
-      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
+      <canvas
+        ref={canvasRef}
+        role="img"
+        aria-label="Animated workshop scene: cable rigs hoist the letters of Suchitra Arts onto a wall, a breaker is thrown, and the flat letters become glowing 3D channel-letter signage."
+        className="absolute inset-0 h-full w-full"
+      />
 
       <p
         ref={kickerRef}
