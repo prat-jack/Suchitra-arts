@@ -183,6 +183,52 @@ body {
   }
 }
 
+/* Contact: the headline's second line glows like the finished sign */
+.ct-glow {
+  text-shadow:
+    0 0 14px rgba(255, 90, 31, 0.5),
+    0 0 44px rgba(255, 90, 31, 0.26),
+    0 0 100px rgba(255, 90, 31, 0.14);
+  animation: ct-breathe 4.5s ease-in-out infinite alternate;
+}
+
+@keyframes ct-breathe {
+  from {
+    text-shadow:
+      0 0 14px rgba(255, 90, 31, 0.5),
+      0 0 44px rgba(255, 90, 31, 0.26),
+      0 0 100px rgba(255, 90, 31, 0.14);
+  }
+  to {
+    text-shadow:
+      0 0 18px rgba(255, 90, 31, 0.62),
+      0 0 54px rgba(255, 90, 31, 0.34),
+      0 0 120px rgba(255, 90, 31, 0.2);
+  }
+}
+
+.ct-node {
+  animation: ct-pulse 2.6s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(255, 90, 31, 0.7);
+}
+
+@keyframes ct-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ct-glow,
+  .ct-node {
+    animation: none;
+  }
+}
+
 /* Process: sticky numeral swaps with a mask-rise on each step change */
 .proc-numeral {
   animation: proc-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1);
