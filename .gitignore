@@ -223,3 +223,4 @@ dist/
 *.local
 .playwright-mcp/
 .claude/settings.local.json
+*.tsbuildinfo
