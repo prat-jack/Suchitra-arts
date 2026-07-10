@@ -74,49 +74,74 @@ body {
 
 .svc-neon.lit .svc-title {
   color: var(--color-bone);
-  text-shadow:
-    0 0 12px rgba(255, 90, 31, 0.55),
-    0 0 38px rgba(255, 90, 31, 0.3),
-    0 0 90px rgba(255, 90, 31, 0.16);
-  animation: svc-flicker 0.85s linear 1;
 }
 
-@keyframes svc-flicker {
-  0%,
+/* Each tube strikes on its own clock, left to right, like a real sign */
+.svc-neon.lit .svc-ltr {
+  animation: svc-tube-on 0.55s linear both;
+  animation-delay: calc(var(--i) * 60ms);
+}
+
+@keyframes svc-tube-on {
+  0% {
+    opacity: 0.12;
+    text-shadow: none;
+  }
+  35% {
+    opacity: 0.85;
+    text-shadow: 0 0 10px rgba(255, 90, 31, 0.4);
+  }
+  50% {
+    opacity: 0.2;
+    text-shadow: none;
+  }
+  70% {
+    opacity: 1;
+  }
   100% {
     opacity: 1;
-  }
-  9% {
-    opacity: 0.35;
-  }
-  14% {
-    opacity: 1;
-  }
-  26% {
-    opacity: 0.55;
-  }
-  34%,
-  58% {
-    opacity: 1;
-  }
-  66% {
-    opacity: 0.72;
-  }
-  74% {
-    opacity: 1;
+    text-shadow:
+      0 0 12px rgba(255, 90, 31, 0.55),
+      0 0 38px rgba(255, 90, 31, 0.3),
+      0 0 90px rgba(255, 90, 31, 0.16);
   }
 }
 
 .svc-extrude.lit .svc-title {
   color: var(--color-tungsten);
-  transform: translate(-2px, -3px);
-  text-shadow:
-    1px 1px 0 #4a3a24,
-    2px 2px 0 #40331f,
-    3px 3px 0 #362b1b,
-    4px 4px 0 #2c2317,
-    5px 5px 0 #221b12,
-    9px 11px 22px rgba(0, 0, 0, 0.55);
+  animation: svc-sway 7s ease-in-out 1.2s infinite alternate;
+}
+
+/* Letters pop from flat to extruded one by one, then the word sways in depth */
+.svc-extrude.lit .svc-ltr {
+  animation: svc-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(var(--i) * 45ms);
+}
+
+@keyframes svc-pop {
+  from {
+    transform: translate(0, 0);
+    text-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+  to {
+    transform: translate(-2px, -3px);
+    text-shadow:
+      1px 1px 0 #4a3a24,
+      2px 2px 0 #40331f,
+      3px 3px 0 #362b1b,
+      4px 4px 0 #2c2317,
+      5px 5px 0 #221b12,
+      9px 11px 22px rgba(0, 0, 0, 0.55);
+  }
+}
+
+@keyframes svc-sway {
+  from {
+    transform: perspective(700px) rotateY(-4deg) rotateX(1.5deg);
+  }
+  to {
+    transform: perspective(700px) rotateY(4deg) rotateX(-1deg);
+  }
 }
 
 .svc-lightbox .svc-title {
@@ -128,7 +153,9 @@ body {
   position: absolute;
   inset: 0.04em -0.06em -0.02em -0.06em;
   border-radius: 2px;
-  background: radial-gradient(120% 170% at 50% 38%, #ffdca6, var(--color-tungsten) 80%);
+  background:
+    radial-gradient(55% 110% at 26% 28%, rgba(255, 232, 190, 0.9), transparent 70%),
+    radial-gradient(120% 170% at 62% 44%, #ffdca6, var(--color-tungsten) 82%);
   opacity: 0;
   transform: scaleX(0.97);
   transition:
@@ -140,22 +167,140 @@ body {
 .svc-lightbox.lit .svc-panel {
   opacity: 1;
   transform: none;
+  animation: svc-backlight 0.75s ease-out both;
   box-shadow:
     0 0 32px rgba(255, 180, 67, 0.35),
     0 0 88px rgba(255, 180, 67, 0.16);
+}
+
+@keyframes svc-backlight {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.95;
+  }
+  45% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* A little OPEN tag hangs off the fascia board and swings */
+.svc-open-tag {
+  position: absolute;
+  right: 0.5em;
+  bottom: -1.5em;
+  z-index: 2;
+  padding: 0.32em 0.6em;
+  font-size: clamp(10px, 1.05vw, 13px);
+  letter-spacing: 0.18em;
+  color: var(--color-bone);
+  background: #241c12;
+  border: 1px solid var(--color-steel);
+  border-radius: 2px;
+  transform-origin: 50% -0.5em;
+  opacity: 0;
+  transition: opacity 0.4s ease 0.55s;
+  pointer-events: none;
+}
+
+.svc-open-tag::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -0.52em;
+  width: 1px;
+  height: 0.52em;
+  background: var(--color-steel);
+}
+
+.svc-lightbox.lit .svc-open-tag {
+  opacity: 1;
+  animation: svc-swing 2.4s ease-in-out 0.6s infinite alternate;
+}
+
+@keyframes svc-swing {
+  from {
+    transform: rotate(5deg);
+  }
+  to {
+    transform: rotate(-5deg);
+  }
 }
 
 .svc-lightbox.lit .svc-title {
   color: var(--color-ink);
 }
 
-.svc-argon.lit .svc-title {
+/* Fabrication: the outline is the layout drawing; a cutting spark travels
+   across and the finished letters appear behind it */
+.svc-argon .svc-title::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
   color: var(--color-bone);
-  letter-spacing: 0.02em;
+  -webkit-text-stroke: 0;
   text-shadow:
     0 0 10px rgba(127, 214, 232, 0.5),
     0 0 34px rgba(127, 214, 232, 0.28),
     0 0 80px rgba(127, 214, 232, 0.14);
+  clip-path: inset(-30% 100% -30% -5%);
+}
+
+.svc-argon.lit .svc-title {
+  -webkit-text-stroke-color: rgba(154, 145, 130, 0.35);
+}
+
+.svc-argon.lit .svc-title::after {
+  animation: svc-cut 1.3s cubic-bezier(0.45, 0, 0.25, 1) 0.15s both;
+}
+
+@keyframes svc-cut {
+  from {
+    clip-path: inset(-30% 100% -30% -5%);
+  }
+  to {
+    clip-path: inset(-30% -5% -30% -5%);
+  }
+}
+
+.svc-spark {
+  position: absolute;
+  top: 42%;
+  left: -2%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #eafcff;
+  box-shadow:
+    0 0 10px rgba(127, 214, 232, 0.95),
+    0 0 26px rgba(127, 214, 232, 0.55);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.svc-argon.lit .svc-spark {
+  animation: svc-spark-run 1.3s cubic-bezier(0.45, 0, 0.25, 1) 0.15s both;
+}
+
+@keyframes svc-spark-run {
+  0% {
+    left: -2%;
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 1;
+  }
+  100% {
+    left: 101%;
+    opacity: 0;
+  }
 }
 
 .svc-underline {
@@ -163,7 +308,7 @@ body {
   box-shadow: 0 0 12px rgba(127, 214, 232, 0.6);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.45s;
 }
 
 .svc-argon.lit .svc-underline {
@@ -186,6 +331,45 @@ body {
 @media (hover: hover) {
   .svc-row:hover .svc-title {
     filter: brightness(1.18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .svc-ltr,
+  .svc-neon.lit .svc-ltr,
+  .svc-extrude.lit .svc-ltr,
+  .svc-extrude.lit .svc-title,
+  .svc-lightbox.lit .svc-panel,
+  .svc-lightbox.lit .svc-open-tag,
+  .svc-argon.lit .svc-title::after,
+  .svc-argon.lit .svc-spark {
+    animation: none !important;
+  }
+
+  .svc-neon.lit .svc-title {
+    text-shadow:
+      0 0 12px rgba(255, 90, 31, 0.55),
+      0 0 38px rgba(255, 90, 31, 0.3),
+      0 0 90px rgba(255, 90, 31, 0.16);
+  }
+
+  .svc-extrude.lit .svc-ltr {
+    transform: translate(-2px, -3px);
+    text-shadow:
+      1px 1px 0 #4a3a24,
+      2px 2px 0 #40331f,
+      3px 3px 0 #362b1b,
+      4px 4px 0 #2c2317,
+      5px 5px 0 #221b12,
+      9px 11px 22px rgba(0, 0, 0, 0.55);
+  }
+
+  .svc-argon.lit .svc-title::after {
+    clip-path: inset(-30% -5% -30% -5%);
+  }
+
+  .svc-lightbox.lit .svc-open-tag {
+    opacity: 1;
   }
 }
 

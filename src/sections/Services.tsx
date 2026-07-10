@@ -1,8 +1,25 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
+
+/** Per-letter spans so each "tube" or extrusion can animate on its own clock. */
+function SplitLetters({ text }: { text: string }) {
+  return (
+    <>
+      {[...text].map((ch, i) => (
+        <span
+          key={i}
+          className="svc-ltr inline-block will-change-transform"
+          style={{ '--i': i } as CSSProperties}
+        >
+          {ch === ' ' ? ' ' : ch}
+        </span>
+      ))}
+    </>
+  )
+}
 
 interface Service {
   id: string
@@ -52,6 +69,7 @@ export default function Services() {
     const ctx = gsap.context(() => {
       if (reducedMotion) {
         gsap.set('.svc-title-mask > *', { yPercent: 0 })
+        gsap.set('.svc-title-mask', { overflow: 'visible' })
         gsap.set(['.svc-meta', '.svc-line'], { clearProps: 'all' })
         gsap.set(conduitRef.current, { scaleY: 1 })
         document.querySelectorAll('.svc-row').forEach((r) => r.classList.add('lit'))
@@ -74,14 +92,20 @@ export default function Services() {
       )
 
       gsap.utils.toArray<HTMLElement>('.svc-row').forEach((row) => {
+        const maskInner = row.querySelector('.svc-title-mask > *')
         gsap.fromTo(
-          row.querySelector('.svc-title-mask > *'),
+          maskInner,
           { yPercent: 112 },
           {
             yPercent: 0,
             duration: 0.9,
             ease: 'power3.out',
             scrollTrigger: { trigger: row, start: 'top 84%' },
+            // The mask clips hanging tags and glow halos once revealed — release it
+            onComplete: () => {
+              const mask = maskInner?.parentElement
+              if (mask) mask.style.overflow = 'visible'
+            },
           },
         )
         gsap.fromTo(
@@ -161,9 +185,24 @@ export default function Services() {
                       <span className="block will-change-transform">
                         <span className="relative inline-block">
                           {s.fx === 'lightbox' && <span aria-hidden className="svc-panel" />}
-                          <span className="svc-title relative inline-block">{s.title}</span>
+                          <span
+                            className="svc-title relative inline-block"
+                            data-text={s.fx === 'argon' ? s.title : undefined}
+                          >
+                            {s.fx === 'neon' || s.fx === 'extrude' ? (
+                              <SplitLetters text={s.title} />
+                            ) : (
+                              s.title
+                            )}
+                          </span>
+                          {s.fx === 'argon' && <span aria-hidden className="svc-spark" />}
                           {s.fx === 'argon' && (
                             <span aria-hidden className="svc-underline mt-2 block h-[3px] w-full" />
+                          )}
+                          {s.fx === 'lightbox' && (
+                            <span aria-hidden className="svc-open-tag font-mono">
+                              OPEN
+                            </span>
                           )}
                         </span>
                       </span>
