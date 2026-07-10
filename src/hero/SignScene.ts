@@ -792,6 +792,27 @@ export class SignScene {
     return true
   }
 
+  /** Mobile browsers routinely kill GPU contexts; preventDefault on lost
+   *  signals we can restore, and a resize rebuilds the composer targets. */
+  attachContextGuards(onLost: () => void, onRestored: () => void): void {
+    this.canvas.addEventListener(
+      'webglcontextlost',
+      (e) => {
+        e.preventDefault()
+        onLost()
+      },
+      false,
+    )
+    this.canvas.addEventListener(
+      'webglcontextrestored',
+      () => {
+        this.resize(this.canvas.clientWidth, this.canvas.clientHeight)
+        onRestored()
+      },
+      false,
+    )
+  }
+
   /** Kick the camera — letter contacts and the breaker throw. */
   triggerShake(amount: number): void {
     if (this.lite) return

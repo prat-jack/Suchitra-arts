@@ -6,6 +6,7 @@ import Nav from './Nav'
 import Services from './sections/Services'
 import Process from './sections/Process'
 import Contact from './sections/Contact'
+import BackToTop from './BackToTop'
 
 gsap.registerPlugin(ScrollToPlugin)
 
@@ -53,6 +54,7 @@ export default function App() {
         </p>
       </section>
       <Contact />
+      <BackToTop />
     </main>
   )
 }

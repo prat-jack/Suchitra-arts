@@ -34,6 +34,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
   const currentLabelRef = useRef('01 — LAYOUT')
   const scrambleTweenRef = useRef<gsap.core.Tween | null>(null)
   const [ready, setReady] = useState(false)
+  const [ctxLost, setCtxLost] = useState(false)
   const [soundOn, setSoundOn] = useState(false)
 
   const toggleSound = () => {
@@ -255,6 +256,10 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
       }
       canvas.addEventListener('pointermove', onMove)
       canvas.addEventListener('click', onClick as EventListener)
+      scene.attachContextGuards(
+        () => setCtxLost(true),
+        () => setCtxLost(false),
+      )
       setReady(true)
     })
 
@@ -274,7 +279,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
   }, [])
 
   return (
-    <section ref={sectionRef} className="relative h-screen w-full overflow-hidden bg-ink">
+    <section ref={sectionRef} className="relative h-svh w-full overflow-hidden bg-ink">
       <canvas
         ref={canvasRef}
         role="img"
@@ -366,18 +371,29 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
         type="button"
         onClick={toggleSound}
         aria-label={soundOn ? 'Turn sound off' : 'Turn sound on'}
-        className="absolute bottom-8 right-6 z-10 cursor-pointer font-mono text-[11px] tracking-[0.2em] text-putty transition-colors duration-200 hover:text-bone md:bottom-10 md:right-12"
+        className="absolute bottom-24 right-4 z-10 cursor-pointer font-mono text-[11px] tracking-[0.2em] text-putty transition-colors duration-200 hover:text-bone md:bottom-10 md:right-12"
       >
         SOUND — {soundOn ? 'ON' : 'OFF'}
       </button>
 
       <div
         className={`absolute inset-0 z-20 flex flex-col items-center justify-center gap-5 bg-ink transition-opacity duration-700 ${
-          ready ? 'pointer-events-none opacity-0' : 'opacity-100'
+          ready && !ctxLost ? 'pointer-events-none opacity-0' : 'opacity-100'
         }`}
       >
         <span className="loader-s font-display text-8xl font-extrabold text-neon">S</span>
-        <span className="font-mono text-[11px] tracking-[0.22em] text-putty">SWITCHING ON…</span>
+        <span className="font-mono text-[11px] tracking-[0.22em] text-putty">
+          {ctxLost ? 'POWER INTERRUPTED — RESTORING…' : 'SWITCHING ON…'}
+        </span>
+        {ctxLost && (
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="mt-2 cursor-pointer rounded-sm border border-steel px-5 py-2 font-mono text-[11px] tracking-[0.2em] text-putty transition-colors duration-200 hover:border-tungsten hover:text-tungsten"
+          >
+            TAP TO RELOAD
+          </button>
+        )}
       </div>
     </section>
   )
