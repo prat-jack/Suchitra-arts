@@ -130,16 +130,29 @@ export default function Services() {
             scrollTrigger: { trigger: row, start: 'top 90%' },
           },
         )
-        // The sign "switches on" as the row reaches the reading zone
-        ScrollTrigger.create({
-          trigger: row,
-          start: 'top 64%',
-          end: 'bottom 18%',
-          toggleClass: { targets: row, className: 'lit' },
-        })
       })
     }, rootRef)
-    return () => ctx.revert()
+
+    // The sign "switches on" as the row reaches the reading zone.
+    // IntersectionObserver instead of ScrollTrigger toggleClass: it measures
+    // live geometry, so pin-spacer layout shifts can never leave it stale.
+    let io: IntersectionObserver | null = null
+    if (!reducedMotion) {
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            entry.target.classList.toggle('lit', entry.isIntersecting)
+          }
+        },
+        { rootMargin: '-18% 0px -36% 0px' },
+      )
+      rootRef.current?.querySelectorAll('.svc-row').forEach((row) => io!.observe(row))
+    }
+
+    return () => {
+      io?.disconnect()
+      ctx.revert()
+    }
   }, [])
 
   return (

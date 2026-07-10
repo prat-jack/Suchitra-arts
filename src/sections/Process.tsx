@@ -92,15 +92,7 @@ export default function Process() {
         gsap.set('.proc-body', { clearProps: 'all' })
         return
       }
-      gsap.utils.toArray<HTMLElement>('.proc-step').forEach((block, i) => {
-        ScrollTrigger.create({
-          trigger: block,
-          start: 'top 55%',
-          end: 'bottom 55%',
-          onToggle: (self) => {
-            if (self.isActive) setActive(i)
-          },
-        })
+      gsap.utils.toArray<HTMLElement>('.proc-step').forEach((block) => {
         gsap.fromTo(
           block.querySelector('.proc-title-mask > *'),
           { yPercent: 112 },
@@ -125,7 +117,24 @@ export default function Process() {
         )
       })
     }, rootRef)
-    return () => ctx.revert()
+
+    // Active step = whichever block crosses the viewport midline.
+    // IntersectionObserver reads live geometry, immune to pin-layout shifts.
+    const blocks = Array.from(rootRef.current?.querySelectorAll('.proc-step') ?? [])
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActive(blocks.indexOf(entry.target))
+        }
+      },
+      { rootMargin: '-50% 0px -50% 0px' },
+    )
+    blocks.forEach((b) => io.observe(b))
+
+    return () => {
+      io.disconnect()
+      ctx.revert()
+    }
   }, [])
 
   return (

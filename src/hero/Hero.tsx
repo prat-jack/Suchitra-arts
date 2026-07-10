@@ -211,7 +211,10 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
           },
         }))
         tl.eventCallback('onComplete', () => scene.setIdle(true))
-        st.refresh()
+        // Global refresh: the pin just added ~4200px to the page, so every
+        // OTHER section's triggers must re-measure too — st.refresh() alone
+        // left them positioned as if the pin didn't exist
+        ScrollTrigger.refresh()
         scrollEndRef.current = st.start + 4200
         updateHud(st.progress)
         if (import.meta.env.DEV) {
