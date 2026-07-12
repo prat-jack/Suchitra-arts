@@ -116,9 +116,16 @@ blobs, plaster bump maps (canvas-generated), FPS governor (EMA < 45fps for 2s
 → drop pixelRatio → then disable bloom/reflection; downgrade-only).
 
 Device paths in `Hero.tsx`:
-- **Desktop:** pinned scrub (ScrollTrigger, scrub 1.1, anticipatePin)
-- **Mobile** (`pointer: coarse` + <1024px): same timeline as a ~6s autoplay
-  cinematic — no pin, no scroll-jack; aspect-compensated FOV (`computeFov`)
+- **Desktop:** pinned scrub (ScrollTrigger, scrub 1.1, anticipatePin, 4200px)
+- **Mobile** (`pointer: coarse` + <1024px), default: same timeline as a ~6s
+  autoplay cinematic — no pin, no scroll-jack; aspect-compensated FOV
+  (`computeFov`)
+- **Mobile, `?mobilescroll` flag** — EXPERIMENTAL, opt-in only: real
+  ScrollTrigger pin tuned for touch (3200px, scrub 0.6) with
+  `normalizeScroll(true)` + `config({ ignoreMobileResize: true })` for
+  mobile pin reliability. Default mobile path is untouched by this — see
+  `docs/mobile-scroll-experiment.md` for testing instructions and the
+  rollback plan (tag: `stable-mobile-cinematic-2026-07-12`).
 - **prefers-reduced-motion:** static finished frame, everything visible
 - WebGL context loss → branded “POWER INTERRUPTED” overlay + tap-to-reload;
   auto-resume on restore
@@ -192,6 +199,16 @@ one swap updates everything (they are placeholders right now).**
 12. **three.js addons:** import from `three/addons/…`; TextGeometry uses
     `depth` (not `height`); UV coords on TextGeometry are raw glyph units —
     normalize per-letter for emissiveMaps.
+13. **Pinned ScrollTrigger on mobile needs `normalizeScroll(true)` +
+    `config({ ignoreMobileResize: true })`** or momentum scroll fights the
+    pin and iOS's address-bar resize causes mid-scroll jumps (GSAP's own
+    guidance). Both are opt-in per visitor, not global defaults — see
+    `docs/mobile-scroll-experiment.md`.
+14. **GitHub Pages' first deploy can't be automated by the workflow token**
+    — `configure-pages`'s `enablement: true` still throws "Resource not
+    accessible by integration" on a repo where Pages has never been
+    configured. The one-time fix is manual: Settings → Pages → Source →
+    GitHub Actions. After that, every push deploys with zero manual steps.
 
 Dev debug handles (DEV builds only): `window.__heroTl`, `__heroScene`,
 `__heroHud`. Force states in the console, e.g.
@@ -201,11 +218,12 @@ Dev debug handles (DEV builds only): `window.__heroTl`, `__heroScene`,
 
 ## Deployment
 
+**Live at https://prat-jack.github.io/Suchitra-arts/** (repo public, Pages
+source set to GitHub Actions, deploy verified end-to-end 2026-07-12).
+
 - `.github/workflows/deploy.yml` — on push to `main`: build with
-  `GITHUB_PAGES=true` (sets Vite `base: '/Suchitra-arts/'`), self-enabling
-  `configure-pages`, upload → deploy.
-- **Blocker:** repo must be **public** for free GitHub Pages (currently the
-  reason the URL 404s). Flip visibility → re-run workflow (or push).
+  `GITHUB_PAGES=true` (sets Vite `base: '/Suchitra-arts/'`), upload → deploy.
+  Every push to `main` redeploys automatically.
 - Runtime asset paths use `import.meta.env.BASE_URL` (see TTF load in
   `SignScene.ts`).
 - OG image (`public/og.jpg`, rendered from the live scene), favicon, JSON-LD
@@ -229,14 +247,20 @@ Prod check: `npm run build && npx vite preview`.
 | `a7350df` | Services headings made literal product demos (tubes/pop/fascia+OPEN tag/cutting spark) |
 | `d133140` | Fixed all section triggers stale by pin height (global refresh) + body overflow killing sticky; lit/active detection moved to IO |
 | `3214eb6` | Back-to-top button + mobile pack: hamburger menu, `h-svh` hero, WebGL context-loss recovery, sound toggle clearance |
+| `8204c05` | README rewritten as full project context (this file) |
+| `9ec4d0f` | Copy workshop doc: full-site copy in 3 voices + recommended cut (`docs/copy-workshop.md`) |
+| `8577e3b` | **Site went live.** Repo made public; GitHub Pages source manually set to "GitHub Actions" (the workflow's automated `configure-pages` step can't create a Pages site on its own — see invariant #14); deploy verified end-to-end on the real URL |
+| *(pending)* | Mobile scroll-driven hero experiment, opt-in via `?mobilescroll` — see `docs/mobile-scroll-experiment.md`. Safety tag: `stable-mobile-cinematic-2026-07-12` |
 
 ## Open items
 
-- [ ] **Repo → public** so Pages deploys (user action)
-- [ ] Real-phone test of the mobile cinematic once live
+- [ ] Decide whether the mobile scroll experiment (`?mobilescroll`) becomes
+      the new default, stays opt-in, or gets reverted — needs real-phone
+      testing on iOS Safari + Android Chrome (see the doc's open questions)
 - [ ] Swap `BIZ` placeholders in `Contact.tsx` + phone in `index.html` JSON-LD
 - [ ] **The Work** (portfolio) — needs real sign photos
 - [ ] **About** — Samuel's story + workshop photos
-- [ ] Copy pass in Samuel's voice (all current copy is placeholder)
+- [ ] Copy pass in Samuel's voice (all current copy is placeholder; the copy
+      workshop doc has a recommended cut ready to apply)
 - [ ] Custom domain → update absolute URLs (`index.html`, sitemap, robots)
 - [ ] Declined for now: idle moths, letter-hover flicker, dying-sign easter egg

@@ -57,14 +57,28 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
     if (!canvas || !section) return
 
     const reducedMotionEarly = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const params = new URLSearchParams(window.location.search)
+    // DEV-only aid so the mobile branch can be exercised from a desktop
+    // browser without real touch hardware. import.meta.env.DEV is statically
+    // false in production builds, so this whole check is dead-code-eliminated
+    // — zero footprint, zero risk in what ships.
+    const forceMobileDev = import.meta.env.DEV && params.has('forcemobile')
     const isMobileEarly =
-      window.matchMedia('(pointer: coarse)').matches && window.innerWidth < 1024
+      forceMobileDev ||
+      (window.matchMedia('(pointer: coarse)').matches && window.innerWidth < 1024)
+    // EXPERIMENTAL, opt-in only: real scroll-driven pin on mobile instead of
+    // the default autoplay cinematic. Gated behind a URL flag so every mobile
+    // visitor who doesn't know this flag exists — including anyone reopening
+    // a link already shared — gets the untouched, known-good cinematic path.
+    // See docs/mobile-scroll-experiment.md for the rollback plan.
+    const mobileScrollFlag = isMobileEarly && params.has('mobilescroll')
 
     const scene = new SignScene(canvas, reducedMotionEarly || isMobileEarly)
     sceneRef.current = scene
     let disposed = false
     let tl: gsap.core.Timeline | null = null
     let heroSt: ScrollTrigger | null = null
+    let scrollNormalizer: ReturnType<typeof ScrollTrigger.normalizeScroll> | null = null
     let tick: ((time: number, dt: number) => void) | null = null
     let onResize: (() => void) | null = null
     let onMove: ((e: PointerEvent) => void) | null = null
@@ -185,8 +199,9 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
         gsap.set([kickerRef.current, cueRef.current, stageRef.current, skipRef.current], { opacity: 0 })
         gsap.set(headlineRef.current, { opacity: 1, y: 0 })
         gsap.set([line1Ref.current, line2Ref.current], { yPercent: 0 })
-      } else if (isMobile) {
-        // Phones get the story as a ~6s autoplay cinematic — no pin, no scroll-jacking
+      } else if (isMobile && !mobileScrollFlag) {
+        // DEFAULT mobile path, untouched — phones get the story as a ~6s
+        // autoplay cinematic. No pin, no scroll-jacking.
         gsap.set([cueRef.current, stageRef.current, skipRef.current], { opacity: 0 })
         tl.timeScale(100 / 6)
         tl.eventCallback('onUpdate', () => {
@@ -197,12 +212,23 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
         tl.eventCallback('onComplete', () => scene.setIdle(true))
         gsap.delayedCall(1.5, () => tl?.play())
       } else {
+        // Real scroll-driven pin. Always used on desktop; on mobile it only
+        // runs when mobileScrollFlag opted in (see flag comment above).
+        // Pinning fights native touch scroll by default on phones — this
+        // path additionally normalizes touch scroll onto the JS thread and
+        // ignores iOS address-bar resize events, per GSAP's own guidance for
+        // making ScrollTrigger pins reliable on mobile.
+        const pinDistance = isMobile ? 3200 : 4200
+        if (isMobile) {
+          ScrollTrigger.config({ ignoreMobileResize: true })
+          scrollNormalizer = ScrollTrigger.normalizeScroll(true)
+        }
         const st = (heroSt = ScrollTrigger.create({
           trigger: section,
           start: 'top top',
-          end: '+=4200',
+          end: `+=${pinDistance}`,
           pin: true,
-          scrub: 1.1,
+          scrub: isMobile ? 0.6 : 1.1,
           anticipatePin: 1,
           animation: tl,
           onUpdate: (self) => {
@@ -212,11 +238,11 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
           },
         }))
         tl.eventCallback('onComplete', () => scene.setIdle(true))
-        // Global refresh: the pin just added ~4200px to the page, so every
-        // OTHER section's triggers must re-measure too — st.refresh() alone
-        // left them positioned as if the pin didn't exist
+        // Global refresh: the pin just added pinDistance px to the page, so
+        // every OTHER section's triggers must re-measure too — st.refresh()
+        // alone left them positioned as if the pin didn't exist
         ScrollTrigger.refresh()
-        scrollEndRef.current = st.start + 4200
+        scrollEndRef.current = st.start + pinDistance
         updateHud(st.progress)
         if (import.meta.env.DEV) {
           ;(window as unknown as Record<string, unknown>).__heroHud = updateHud
@@ -271,6 +297,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
       if (onClick) canvas.removeEventListener('click', onClick as EventListener)
       // Kill only the hero's own trigger — other sections manage theirs
       heroSt?.kill()
+      scrollNormalizer?.kill()
       tl?.kill()
       soundRef.current?.dispose()
       soundRef.current = null
