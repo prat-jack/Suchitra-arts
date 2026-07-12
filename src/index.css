@@ -375,6 +375,35 @@ body {
   }
 }
 
+/* Work gallery: tiles rest dimmed like unlit signs, light up in view */
+.wk-img {
+  filter: saturate(0.55) brightness(0.72);
+  transform: scale(1.015);
+  transition:
+    filter 0.7s ease,
+    transform 0.7s ease;
+}
+
+.wk-tile.lit .wk-img {
+  filter: saturate(1) brightness(1);
+  transform: scale(1);
+}
+
+@media (hover: hover) {
+  .wk-tile:hover .wk-img {
+    filter: saturate(1.05) brightness(1.06);
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-img {
+    filter: none;
+    transform: none;
+    transition: none;
+  }
+}
+
 /* Contact: the headline's second line glows like the finished sign */
 .ct-glow {
   text-shadow:

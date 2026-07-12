@@ -155,15 +155,17 @@ export default function Process() {
       </div>
 
       <div className="mx-6 mt-10 md:mx-12 md:mt-16 lg:mx-20">
-        <div className="md:grid md:grid-cols-[300px_minmax(0,1fr)] md:gap-16 lg:grid-cols-[380px_minmax(0,1fr)]">
-          <div className="hidden md:block">
-            <div className="sticky top-[22vh]">
+        <div className="grid grid-cols-[76px_minmax(0,1fr)] gap-5 md:grid-cols-[300px_minmax(0,1fr)] md:gap-16 lg:grid-cols-[380px_minmax(0,1fr)]">
+          <div>
+            {/* Same sticky-numeral experience as desktop, scaled to a narrow
+                column on phones. top clears the (now solid) fixed header. */}
+            <div className="sticky top-24 md:top-[22vh]">
               <div key={active} className="proc-numeral-wrap overflow-hidden">
-                <span className="proc-numeral block font-display text-[11rem] font-extrabold leading-none text-bone lg:text-[15rem]">
+                <span className="proc-numeral block font-display text-[3.4rem] font-extrabold leading-none text-bone md:text-[11rem] lg:text-[15rem]">
                   {STEPS[active].id}
                 </span>
               </div>
-              <p className="mt-4 font-mono text-[11px] tracking-[0.24em] text-putty">
+              <p className="mt-4 hidden font-mono text-[11px] tracking-[0.24em] text-putty md:block">
                 STEP {STEPS[active].id} / 04 — {STEPS[active].title}
               </p>
             </div>
@@ -179,9 +181,6 @@ export default function Process() {
               >
                 <span className="text-argon/80">
                   <StepIcon kind={s.icon} />
-                </span>
-                <span className="mt-5 font-mono text-[11px] tracking-[0.24em] text-putty md:hidden">
-                  STEP {s.id} / 04
                 </span>
                 <h3 className="mt-2 font-display text-4xl font-extrabold leading-[0.95] text-bone md:mt-5 md:text-6xl">
                   <span className="proc-title-mask block overflow-hidden pb-[0.08em]">

@@ -4,11 +4,13 @@ import MagneticButton from './MagneticButton'
 const LINKS = [
   { href: '#work', label: 'WHAT WE MAKE' },
   { href: '#process', label: 'PROCESS' },
+  { href: '#gallery', label: 'THE WORK' },
   { href: '#about', label: 'ABOUT' },
 ]
 
 export default function Nav({ visible }: { visible: boolean }) {
   const [open, setOpen] = useState(false)
+  const [solid, setSolid] = useState(false)
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
@@ -17,12 +19,26 @@ export default function Nav({ visible }: { visible: boolean }) {
     }
   }, [open])
 
+  useEffect(() => {
+    // Past the hero, section content (huge Process numerals, Services titles)
+    // scrolls up underneath the bar — a fade-to-transparent gradient lets it
+    // collide with the logo. Go solid once anything below the hero reaches it.
+    const target = document.getElementById('work')
+    if (!target) return
+    const update = () => setSolid(target.getBoundingClientRect().top < 90)
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    return () => window.removeEventListener('scroll', update)
+  }, [])
+
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 bg-gradient-to-b from-ink/80 to-transparent transition-all duration-700 ${
-          visible ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-3 opacity-0'
-        }`}
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+          solid
+            ? 'border-b border-steel/50 bg-ink/90 backdrop-blur-md'
+            : 'border-b border-transparent bg-gradient-to-b from-ink/80 to-transparent'
+        } ${visible ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-3 opacity-0'}`}
       >
         <nav className="flex items-center justify-between px-6 py-4 md:px-12 md:py-5">
           <a href="#" className="font-display text-2xl font-extrabold tracking-wide text-bone">

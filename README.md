@@ -155,6 +155,22 @@ cross the viewport midline (IntersectionObserver → React state). Right column:
 Measure → Design & Proof → Fabricate → Install & Light Up, each with an
 argon-tinted line icon and spec chip. Cool-tinted where Services is warm.
 
+### The Work — gallery (id="gallery")
+
+Masonry-ish grid (`sections/Work.tsx`) of six signage photos with job-card
+captions. Tiles rest dimmed/desaturated and light up in the reading band
+(IO adds `.lit`) — same unlit→lit language as Services. **All images are
+CC0/Public-Domain prototypes from Openverse** (source ids in a comment at
+the top of `Work.tsx`, files in `public/work/`) — swap the `WORKS` array
+entries for real install photos when Samuel provides them. A tungsten
+disclaimer line in the section says exactly that.
+
+### About — the workshop (id="about")
+
+General (deliberately not Samuel-specific yet): "A WORKSHOP, NOT AN AGENCY"
+headline, three paragraphs in the site voice, mono spec strip. Swap in the
+real founder story when it exists.
+
 ### Contact — the conversion point
 
 “LET'S PUT YOUR NAME IN LIGHTS” (second line breathes neon). WhatsApp deep
@@ -250,7 +266,8 @@ Prod check: `npm run build && npx vite preview`.
 | `8204c05` | README rewritten as full project context (this file) |
 | `9ec4d0f` | Copy workshop doc: full-site copy in 3 voices + recommended cut (`docs/copy-workshop.md`) |
 | `8577e3b` | **Site went live.** Repo made public; GitHub Pages source manually set to "GitHub Actions" (the workflow's automated `configure-pages` step can't create a Pages site on its own — see invariant #14); deploy verified end-to-end on the real URL |
-| *(pending)* | Mobile scroll-driven hero experiment, opt-in via `?mobilescroll` — see `docs/mobile-scroll-experiment.md`. Safety tag: `stable-mobile-cinematic-2026-07-12` |
+| `0c0d756` | Mobile scroll-driven hero experiment, opt-in via `?mobilescroll` — see `docs/mobile-scroll-experiment.md`. Safety tag: `stable-mobile-cinematic-2026-07-12` |
+| *(pending)* | Work gallery (CC0 prototype imagery), general About section, nav goes solid past the hero (fixes huge content colliding with the transparent header), Process sticky numeral now also on mobile |
 
 ## Open items
 
@@ -258,8 +275,9 @@ Prod check: `npm run build && npx vite preview`.
       the new default, stays opt-in, or gets reverted — needs real-phone
       testing on iOS Safari + Android Chrome (see the doc's open questions)
 - [ ] Swap `BIZ` placeholders in `Contact.tsx` + phone in `index.html` JSON-LD
-- [ ] **The Work** (portfolio) — needs real sign photos
-- [ ] **About** — Samuel's story + workshop photos
+- [ ] **The Work**: replace the six CC0 prototype images in `public/work/`
+      with real install photos (edit the `WORKS` array in `sections/Work.tsx`)
+- [ ] **About**: replace the general copy with Samuel's real story + photos
 - [ ] Copy pass in Samuel's voice (all current copy is placeholder; the copy
       workshop doc has a recommended cut ready to apply)
 - [ ] Custom domain → update absolute URLs (`index.html`, sitemap, robots)
