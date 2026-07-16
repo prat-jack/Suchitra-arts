@@ -314,7 +314,7 @@ Prod check: `npm run build && npx vite preview`.
 | `0c0d756` | Mobile scroll-driven hero experiment, opt-in via `?mobilescroll` — see `docs/mobile-scroll-experiment.md`. Safety tag: `stable-mobile-cinematic-2026-07-12` |
 | `e4a61aa` | Work gallery (CC0 prototype imagery), general About section, nav goes solid past the hero (fixes huge content colliding with the transparent header), Process sticky numeral now also on mobile |
 | `ae5a37b` | Gallery replaced with six self-rendered halo-lit concept signs (dev-only `StillSign` renderer, `?still=<id>`) after user found the CC0 photos weak; Process active-step detection moved from IO to a scroll listener (IO lagged/skipped under mobile momentum scrolling) |
-| *(pending)* | StillSign realism v2 (baked per-letter halo with occluded cores, contact shadows, IBL on letters, seamless weathered walls, camera roll) after client review "looks like art, I want realistic"; all six renders recaptured. Process numeral now flips on title-crossing, not block-edge ("number changes too early") |
+| `c71de73` | StillSign realism v2 (baked per-letter halo with occluded cores, contact shadows, IBL on letters, seamless weathered walls, camera roll) after client review "looks like art, I want realistic"; all six renders recaptured. Process numeral now flips on title-crossing, not block-edge ("number changes too early"). **Safety tag: `stable-photoreal-gallery-2026-07-17` (return point #2, deploy-verified)** |
 
 ## Open items
 
