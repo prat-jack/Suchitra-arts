@@ -4,63 +4,53 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// PROTOTYPE IMAGERY — reference styles, not Suchitra Arts installs.
-// All images are CC0 / Public Domain via Openverse (no attribution required):
-//   work-neon-letters   openverse id e09a1445 (flickr 51679210376)
-//   work-tube-script    openverse id 5bf289d7 (flickr 51558190153)
-//   work-facade         openverse id ea2d7b75 (flickr 51709111519)
-//   work-fascia         openverse id 5333fc31 (flickr 51558876555)
-//   work-window-neon    openverse id 6298ce35 (flickr 51708636449)
-//   work-dimensional    openverse id 0fd1125e (flickr 15114681664)
-// Swap each entry's src for a real install photo when Samuel provides them.
+// CONCEPT RENDERS — fictional marques, rendered in this project's own engine
+// (dev-only StillSign renderer, /?still=<id> — see src/hero/StillSign.ts).
+// Each shows a reverse-channel (halo-lit) treatment we fabricate. Swap each
+// entry's src for a real install photo when Samuel provides them.
 interface WorkItem {
   src: string
   alt: string
   title: string
   chips: string
-  tall?: boolean
-  wide?: boolean
 }
 
 const WORKS: WorkItem[] = [
   {
-    src: 'work/work-neon-letters.jpg',
-    alt: 'Close-up of orange neon channel lettering glowing at night',
-    title: 'NEON LETTERING',
-    chips: 'GLASS TUBE · 12MM · AMBER',
-    wide: true,
+    src: 'work/render-kanaka.jpg',
+    alt: 'Concept render: KANAKA & CO in halo-lit brass serif letters on dark stone',
+    title: 'KANAKA & CO',
+    chips: 'REVERSE-LIT BRASS · STONE',
   },
   {
-    src: 'work/work-window-neon.jpg',
-    alt: 'Colourful neon signs glowing in a shop window at night',
-    title: 'WINDOW NEON',
-    chips: 'CUSTOM BENT · MULTI-COLOUR',
-    tall: true,
+    src: 'work/render-marigold.jpg',
+    alt: 'Concept render: MARIGOLD CAFE & BAKERY, two-line halo letters on warm plaster',
+    title: 'MARIGOLD',
+    chips: 'HALO LETTERS · WARM PLASTER',
   },
   {
-    src: 'work/work-tube-script.jpg',
-    alt: 'Amber neon script lettering mounted on a dark fascia',
-    title: 'TUBE SCRIPT',
-    chips: 'GLASS TUBE · FASCIA MOUNT',
+    src: 'work/render-basava.jpg',
+    alt: 'Concept render: BASAVA SILKS in bold gold letters with amber halo on charcoal',
+    title: 'BASAVA SILKS',
+    chips: 'GOLD STEEL · AMBER HALO',
   },
   {
-    src: 'work/work-fascia.jpg',
-    alt: 'Hand-painted gilded lettering on a traditional shop fascia board',
-    title: 'PAINTED FASCIA',
-    chips: 'ENAMEL · GOLD LEAF',
+    src: 'work/render-bakehouse.jpg',
+    alt: 'Concept render: THE BAKEHOUSE in dark letters with cream halo on exposed brick',
+    title: 'THE BAKEHOUSE',
+    chips: 'HALO LETTERS · EXPOSED BRICK',
   },
   {
-    src: 'work/work-facade.jpg',
-    alt: 'Restaurant facade at night with warm illuminated channel letters',
-    title: 'FULL FACADE',
-    chips: 'CHANNEL LETTERS · WARM WHITE',
-    wide: true,
+    src: 'work/render-veda.jpg',
+    alt: 'Concept render: VEDA WELLNESS SPA in serif letters with a cool halo on plaster',
+    title: 'VEDA WELLNESS',
+    chips: 'SATIN STEEL · COOL HALO',
   },
   {
-    src: 'work/work-dimensional.jpg',
-    alt: 'Cast dimensional letters on a neon-bordered panel, black and white',
-    title: 'DIMENSIONAL LETTERS',
-    chips: 'CAST METAL · HALO BORDER',
+    src: 'work/render-cubbon.jpg',
+    alt: 'Concept render: CUBBON HOUSE in brass serif letters with amber halo on stone',
+    title: 'CUBBON HOUSE',
+    chips: 'SERIF BRASS · AMBER HALO',
   },
 ]
 
@@ -120,10 +110,11 @@ export default function Work() {
           THE WORK — SIGNS OUT THE DOOR
         </p>
         <p className="mt-4 max-w-md text-sm leading-relaxed text-putty">
-          A wall of finished jobs: lit, mounted and photographed on the street where they work.
+          The looks we build most — reverse-lit brass, halo letters, backlit fascias — shown the
+          way they read after dark.
         </p>
         <p className="mt-3 font-mono text-[10px] tracking-[0.2em] text-tungsten/80">
-          PROTOTYPE IMAGERY — REFERENCE STYLES, TO BE REPLACED WITH SUCHITRA ARTS INSTALLS
+          STUDIO CONCEPT RENDERS — INSTALL PHOTOGRAPHS TO FOLLOW
         </p>
       </div>
 
@@ -132,15 +123,15 @@ export default function Work() {
           {WORKS.map((w) => (
             <figure
               key={w.src}
-              className={`wk-tile group relative overflow-hidden rounded-sm border border-steel/50 bg-charcoal ${
-                w.tall ? 'sm:row-span-2' : ''
-              } ${w.wide ? 'sm:col-span-2 lg:col-span-2' : ''}`}
+              className="wk-tile group relative overflow-hidden rounded-sm border border-steel/50 bg-charcoal"
             >
+              {/* Renders are 16:10 with signs spanning most of the width —
+                  matching the tile aspect avoids cropping letter edges */}
               <img
                 src={w.src}
                 alt={w.alt}
                 loading="lazy"
-                className={`wk-img w-full object-cover ${w.tall ? 'h-full min-h-[420px]' : 'h-64 md:h-72'}`}
+                className="wk-img aspect-[16/10] w-full object-cover"
               />
               <figcaption className="flex items-baseline justify-between gap-4 border-t border-steel/50 px-4 py-3">
                 <span className="font-display text-lg font-extrabold tracking-wide text-bone">

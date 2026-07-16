@@ -118,21 +118,35 @@ export default function Process() {
       })
     }, rootRef)
 
-    // Active step = whichever block crosses the viewport midline.
-    // IntersectionObserver reads live geometry, immune to pin-layout shifts.
-    const blocks = Array.from(rootRef.current?.querySelectorAll('.proc-step') ?? [])
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActive(blocks.indexOf(entry.target))
-        }
-      },
-      { rootMargin: '-50% 0px -50% 0px' },
+    // Active step = whichever block straddles the viewport midline, computed
+    // directly from scroll position. IO fired the swaps late (or skipped
+    // steps) under mobile momentum scrolling — a scroll listener evaluates
+    // every scroll event deterministically, and clamping to nearest handles
+    // the gaps between blocks.
+    const blocks = Array.from(
+      rootRef.current?.querySelectorAll<HTMLElement>('.proc-step') ?? [],
     )
-    blocks.forEach((b) => io.observe(b))
+    const updateActive = () => {
+      const mid = window.innerHeight / 2
+      let straddle = -1
+      let nearestIdx = 0
+      let nearestD = Infinity
+      blocks.forEach((b, i) => {
+        const r = b.getBoundingClientRect()
+        if (r.top <= mid && r.bottom > mid) straddle = i
+        const d = Math.min(Math.abs(r.top - mid), Math.abs(r.bottom - mid))
+        if (d < nearestD) {
+          nearestD = d
+          nearestIdx = i
+        }
+      })
+      setActive(straddle >= 0 ? straddle : nearestIdx)
+    }
+    updateActive()
+    window.addEventListener('scroll', updateActive, { passive: true })
 
     return () => {
-      io.disconnect()
+      window.removeEventListener('scroll', updateActive)
       ctx.revert()
     }
   }, [])

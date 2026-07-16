@@ -58,6 +58,22 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
 
     const reducedMotionEarly = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const params = new URLSearchParams(window.location.search)
+
+    // DEV-only concept-sign renderer for gallery imagery (see StillSign.ts).
+    // Dynamic import behind the DEV guard: dead-code-eliminated in prod.
+    if (import.meta.env.DEV && params.has('still')) {
+      let stillDisposed = false
+      let cleanupStill: (() => void) | null = null
+      import('./StillSign').then(({ mountStill }) => {
+        if (stillDisposed) return
+        cleanupStill = mountStill(canvas, params.get('still') || 'kanaka')
+        setReady(true)
+      })
+      return () => {
+        stillDisposed = true
+        cleanupStill?.()
+      }
+    }
     // DEV-only aid so the mobile branch can be exercised from a desktop
     // browser without real touch hardware. import.meta.env.DEV is statically
     // false in production builds, so this whole check is dead-code-eliminated
@@ -305,6 +321,11 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
     }
   }, [])
 
+  const isStillMode =
+    import.meta.env.DEV &&
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).has('still')
+
   return (
     <section ref={sectionRef} className="relative h-svh w-full overflow-hidden bg-ink">
       <canvas
@@ -314,6 +335,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
         className="absolute inset-0 h-full w-full"
       />
 
+      <div className={isStillMode ? 'hidden' : 'contents'}>
       <p
         ref={kickerRef}
         className="absolute left-6 top-6 translate-y-3 font-mono text-[11px] tracking-[0.22em] text-putty opacity-0 md:left-12 md:top-10 md:text-xs"
@@ -402,6 +424,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
       >
         SOUND — {soundOn ? 'ON' : 'OFF'}
       </button>
+      </div>
 
       <div
         className={`absolute inset-0 z-20 flex flex-col items-center justify-center gap-5 bg-ink transition-opacity duration-700 ${

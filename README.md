@@ -151,19 +151,42 @@ Conduit line scrubs down the left edge; junction node lights per row.
 ### Process — sticky job-card
 
 Left column pins a giant numeral (01–04) that swaps with a mask-rise as steps
-cross the viewport midline (IntersectionObserver → React state). Right column:
-Measure → Design & Proof → Fabricate → Install & Light Up, each with an
-argon-tinted line icon and spec chip. Cool-tinted where Services is warm.
+cross the viewport midline. Active-step detection is a **scroll listener over
+live `getBoundingClientRect`** (straddle test + nearest-block fallback), not
+IO — IO fired late or skipped steps under mobile momentum scrolling
+(invariant #7). Right column: Measure → Design & Proof → Fabricate →
+Install & Light Up, each with an argon-tinted line icon and spec chip.
+Cool-tinted where Services is warm. Numeral column works on mobile too
+(76px column, 3.4rem numeral, sticky below the solid nav).
 
 ### The Work — gallery (id="gallery")
 
-Masonry-ish grid (`sections/Work.tsx`) of six signage photos with job-card
+Uniform 16:10 grid (`sections/Work.tsx`) of six signage images with job-card
 captions. Tiles rest dimmed/desaturated and light up in the reading band
-(IO adds `.lit`) — same unlit→lit language as Services. **All images are
-CC0/Public-Domain prototypes from Openverse** (source ids in a comment at
-the top of `Work.tsx`, files in `public/work/`) — swap the `WORKS` array
-entries for real install photos when Samuel provides them. A tungsten
-disclaimer line in the section says exactly that.
+(IO adds `.lit`) — same unlit→lit language as Services. **All six images are
+our own concept renders** — fictional Indian marques (KANAKA & CO, MARIGOLD,
+BASAVA SILKS, THE BAKEHOUSE, VEDA WELLNESS, CUBBON HOUSE) in the halo-lit
+reverse-channel style of premium café/boutique signage, rendered by the
+dev-only `StillSign` renderer (below). Files in `public/work/render-*.jpg`;
+swap the `WORKS` array entries for real install photos when Samuel provides
+them. A tungsten disclaimer line says "STUDIO CONCEPT RENDERS".
+Tile `<img>`s are `aspect-[16/10]` to match the renders — fixed-height
+`object-cover` would crop letter edges off the wide signs.
+
+#### StillSign — dev-only concept-sign renderer
+
+`src/hero/StillSign.ts`, mounted by `Hero.tsx` **only when
+`import.meta.env.DEV && ?still=<id>`** (dynamic import — dead-code-eliminated
+from prod; verify with `grep mountStill dist/assets/*.js`). Renders one
+halo-lit sign to the hero canvas for screenshotting: procedural wall texture
+(stone/plaster/brick/charcoal), letters via `buildStillRows` in `letters.ts`,
+one RectAreaLight strip per row (the halo — point lights read as bead
+hotspots), camera-side fill + downlight spot, auto-fit camera distance
+computed from row span/fov/aspect with a per-config `fit` bias. Configs live
+in the `STILLS` record (`?still=kanaka|marigold|basava|bakehouse|veda|cubbon`).
+Fonts for it: `public/fonts/PlayfairDisplay-Bold.ttf`, `Poppins-SemiBold.ttf`
+(fetched only in DEV). Capture at 1600×1000, save to
+`public/work/render-<id>.jpg`.
 
 ### About — the workshop (id="about")
 
@@ -267,7 +290,8 @@ Prod check: `npm run build && npx vite preview`.
 | `9ec4d0f` | Copy workshop doc: full-site copy in 3 voices + recommended cut (`docs/copy-workshop.md`) |
 | `8577e3b` | **Site went live.** Repo made public; GitHub Pages source manually set to "GitHub Actions" (the workflow's automated `configure-pages` step can't create a Pages site on its own — see invariant #14); deploy verified end-to-end on the real URL |
 | `0c0d756` | Mobile scroll-driven hero experiment, opt-in via `?mobilescroll` — see `docs/mobile-scroll-experiment.md`. Safety tag: `stable-mobile-cinematic-2026-07-12` |
-| *(pending)* | Work gallery (CC0 prototype imagery), general About section, nav goes solid past the hero (fixes huge content colliding with the transparent header), Process sticky numeral now also on mobile |
+| `e4a61aa` | Work gallery (CC0 prototype imagery), general About section, nav goes solid past the hero (fixes huge content colliding with the transparent header), Process sticky numeral now also on mobile |
+| *(pending)* | Gallery replaced with six self-rendered halo-lit concept signs (dev-only `StillSign` renderer, `?still=<id>`) after user found the CC0 photos weak; Process active-step detection moved from IO to a scroll listener (IO lagged/skipped under mobile momentum scrolling) |
 
 ## Open items
 
@@ -275,8 +299,8 @@ Prod check: `npm run build && npx vite preview`.
       the new default, stays opt-in, or gets reverted — needs real-phone
       testing on iOS Safari + Android Chrome (see the doc's open questions)
 - [ ] Swap `BIZ` placeholders in `Contact.tsx` + phone in `index.html` JSON-LD
-- [ ] **The Work**: replace the six CC0 prototype images in `public/work/`
-      with real install photos (edit the `WORKS` array in `sections/Work.tsx`)
+- [ ] **The Work**: replace the six concept renders in `public/work/` with
+      real install photos (edit the `WORKS` array in `sections/Work.tsx`)
 - [ ] **About**: replace the general copy with Samuel's real story + photos
 - [ ] Copy pass in Samuel's voice (all current copy is placeholder; the copy
       workshop doc has a recommended cut ready to apply)

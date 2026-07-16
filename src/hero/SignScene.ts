@@ -18,7 +18,7 @@ function computeFov(aspect: number): number {
 }
 
 /** Film grain (dithers the dark-wall gradient banding) + gentle vignette. */
-const GrainVignetteShader = {
+export const GrainVignetteShader = {
   uniforms: {
     tDiffuse: { value: null as THREE.Texture | null },
     uTime: { value: 0 },

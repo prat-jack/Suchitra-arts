@@ -90,6 +90,94 @@ export interface SignRows {
   arts: SignLetter[]
 }
 
+// ─── Still-render support (dev-only concept renders for the Work gallery) ───
+
+export interface StillRowSpec {
+  text: string
+  size: number
+  /** letter gap as a fraction of size (default 0.16) */
+  track?: number
+}
+
+export interface StillRow {
+  y: number
+  minX: number
+  maxX: number
+}
+
+/**
+ * Word-per-row sign builder with caller-supplied materials — used by the
+ * dev-only StillSign renderer to produce gallery concept images. Rows are
+ * centered on x and stacked around centerY. Spaces produce gaps, not meshes.
+ */
+export function buildStillRows(
+  font: Font,
+  rows: StillRowSpec[],
+  parent: THREE.Object3D,
+  faceMat: THREE.MeshStandardMaterial,
+  sideMat: THREE.MeshStandardMaterial,
+  centerY: number,
+  depth = 0.12,
+): StillRow[] {
+  const rowGap = rows[0].size * 0.42
+  const built: { meshes: THREE.Mesh[]; xs: number[]; widths: number[]; size: number }[] = []
+
+  for (const row of rows) {
+    const gap = row.size * (row.track ?? 0.16)
+    const meshes: THREE.Mesh[] = []
+    const widths: number[] = []
+    let cursor = 0
+    const positions: number[] = []
+    for (const ch of row.text) {
+      if (ch === ' ') {
+        cursor += row.size * 0.42
+        continue
+      }
+      const geometry = new TextGeometry(ch, {
+        font,
+        size: row.size,
+        depth,
+        curveSegments: 10,
+        bevelEnabled: true,
+        bevelThickness: 0.008,
+        bevelSize: 0.006,
+        bevelSegments: 2,
+      })
+      geometry.computeBoundingBox()
+      const bb = geometry.boundingBox!
+      const w = bb.max.x - bb.min.x
+      const h = bb.max.y - bb.min.y
+      geometry.translate(-bb.min.x - w / 2, -bb.min.y - h / 2, -bb.min.z)
+      const mesh = new THREE.Mesh(geometry, [faceMat, sideMat])
+      meshes.push(mesh)
+      widths.push(w)
+      positions.push(cursor + w / 2)
+      cursor += w + gap
+    }
+    const total = cursor - gap
+    built.push({ meshes, xs: positions.map((p) => p - total / 2), widths, size: row.size })
+  }
+
+  const totalH =
+    built.reduce((s, r) => s + r.size, 0) + rowGap * (built.length - 1)
+  let y = centerY + totalH / 2
+  const out: StillRow[] = []
+  for (const row of built) {
+    const rowY = y - row.size / 2
+    let minX = Infinity
+    let maxX = -Infinity
+    row.meshes.forEach((m, i) => {
+      m.position.set(row.xs[i], rowY, 0)
+      parent.add(m)
+      minX = Math.min(minX, row.xs[i] - row.widths[i] / 2)
+      maxX = Math.max(maxX, row.xs[i] + row.widths[i] / 2)
+    })
+    out.push({ y: rowY, minX, maxX })
+    y -= row.size + rowGap
+  }
+  return out
+}
+
 export function buildSign(font: Font, parent: THREE.Object3D): SignRows {
   const ledTex = makeLedTexture()
   const suchitra = [...'SUCHITRA'].map((c) => buildLetter(c, font, 0.85, ledTex))
