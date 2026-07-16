@@ -150,14 +150,17 @@ Conduit line scrubs down the left edge; junction node lights per row.
 
 ### Process — sticky job-card
 
-Left column pins a giant numeral (01–04) that swaps with a mask-rise as steps
-cross the viewport midline. Active-step detection is a **scroll listener over
-live `getBoundingClientRect`** (straddle test + nearest-block fallback), not
-IO — IO fired late or skipped steps under mobile momentum scrolling
-(invariant #7). Right column: Measure → Design & Proof → Fabricate →
-Install & Light Up, each with an argon-tinted line icon and spec chip.
-Cool-tinted where Services is warm. Numeral column works on mobile too
-(76px column, 3.4rem numeral, sticky below the solid nav).
+Left column pins a giant numeral (01–04) that swaps with a mask-rise. Active
+step = **the last step whose TITLE center has crossed the viewport midline**,
+computed by a scroll listener over live `getBoundingClientRect`. Two client
+bugs shaped this: IO fired late / skipped steps under mobile momentum
+scrolling (invariant #7), and anchoring on block edges flipped the numeral
+while the incoming title was still half a screen away ("the number changes
+too early") — blocks are contiguous with huge internal padding, so the
+anchor must be the title, not the block. Right column: Measure → Design &
+Proof → Fabricate → Install & Light Up, each with an argon-tinted line icon
+and spec chip. Cool-tinted where Services is warm. Numeral column works on
+mobile too (76px column, 3.4rem numeral, sticky below the solid nav).
 
 ### The Work — gallery (id="gallery")
 
@@ -178,15 +181,34 @@ Tile `<img>`s are `aspect-[16/10]` to match the renders — fixed-height
 `src/hero/StillSign.ts`, mounted by `Hero.tsx` **only when
 `import.meta.env.DEV && ?still=<id>`** (dynamic import — dead-code-eliminated
 from prod; verify with `grep mountStill dist/assets/*.js`). Renders one
-halo-lit sign to the hero canvas for screenshotting: procedural wall texture
-(stone/plaster/brick/charcoal), letters via `buildStillRows` in `letters.ts`,
-one RectAreaLight strip per row (the halo — point lights read as bead
-hotspots), camera-side fill + downlight spot, auto-fit camera distance
-computed from row span/fov/aspect with a per-config `fit` bias. Configs live
-in the `STILLS` record (`?still=kanaka|marigold|basava|bakehouse|veda|cubbon`).
-Fonts for it: `public/fonts/PlayfairDisplay-Bold.ttf`, `Poppins-SemiBold.ttf`
-(fetched only in DEV). Capture at 1600×1000, save to
-`public/work/render-<id>.jpg`.
+halo-lit sign to the hero canvas for screenshotting. Realism pipeline (v2,
+after client feedback "looks like art, I want realistic"):
+
+- **Baked per-letter halo** (`bakeHalo`): orthographic silhouette snapshot of
+  the letters → stacked blurred copies (hot rim → wide falloff) → sharp
+  letterform multiplied back in as a dark core (each letter blocks its own
+  LED wash) → additive plane hugging the wall. A plain light strip reads
+  airbrushed; this is the reverse-channel photo signature. A dim
+  RectAreaLight strip per row remains for broad physical wash.
+- **Real contact shadows**: shadow maps on, the above-sign downlight casts
+  letter shadows. Shadow map is 512px ON PURPOSE — PCF blur at low res reads
+  as soft penumbra; 2048 gave hard letter-shaped ghosts.
+- **IBL on letter materials only** (RoomEnvironment via PMREM). Never put it
+  on `scene.environment` — it floods the matte night wall/floor. And never
+  reuse the dark color canvas as `roughnessMap` — roughness reads the green
+  channel, a dark map ≈ roughness 0 ≈ mirror wall.
+- **Seamless walls**: every texture feature is stamped at all 9 wrap offsets
+  (RepeatWrapping seams read as grid lines); low-frequency mottling +
+  vertical weathering streaks + per-brick mortar shadows; brick module sizes
+  divide the canvas exactly so the bond tiles.
+- **Camera**: auto-fit distance from row span/fov/aspect with per-config
+  `fit` bias, plus slight `roll` (degrees) for a candid handheld frame.
+- Grain runs at half the hero's strength (a still reads noisier than motion).
+
+Configs live in the `STILLS` record
+(`?still=kanaka|marigold|basava|bakehouse|veda|cubbon`). Fonts for it:
+`public/fonts/PlayfairDisplay-Bold.ttf`, `Poppins-SemiBold.ttf` (fetched only
+in DEV). Capture at 1600×1000, save to `public/work/render-<id>.jpg`.
 
 ### About — the workshop (id="about")
 
@@ -291,7 +313,8 @@ Prod check: `npm run build && npx vite preview`.
 | `8577e3b` | **Site went live.** Repo made public; GitHub Pages source manually set to "GitHub Actions" (the workflow's automated `configure-pages` step can't create a Pages site on its own — see invariant #14); deploy verified end-to-end on the real URL |
 | `0c0d756` | Mobile scroll-driven hero experiment, opt-in via `?mobilescroll` — see `docs/mobile-scroll-experiment.md`. Safety tag: `stable-mobile-cinematic-2026-07-12` |
 | `e4a61aa` | Work gallery (CC0 prototype imagery), general About section, nav goes solid past the hero (fixes huge content colliding with the transparent header), Process sticky numeral now also on mobile |
-| *(pending)* | Gallery replaced with six self-rendered halo-lit concept signs (dev-only `StillSign` renderer, `?still=<id>`) after user found the CC0 photos weak; Process active-step detection moved from IO to a scroll listener (IO lagged/skipped under mobile momentum scrolling) |
+| `ae5a37b` | Gallery replaced with six self-rendered halo-lit concept signs (dev-only `StillSign` renderer, `?still=<id>`) after user found the CC0 photos weak; Process active-step detection moved from IO to a scroll listener (IO lagged/skipped under mobile momentum scrolling) |
+| *(pending)* | StillSign realism v2 (baked per-letter halo with occluded cores, contact shadows, IBL on letters, seamless weathered walls, camera roll) after client review "looks like art, I want realistic"; all six renders recaptured. Process numeral now flips on title-crossing, not block-edge ("number changes too early") |
 
 ## Open items
 
