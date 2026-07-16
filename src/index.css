@@ -114,9 +114,11 @@ body {
   animation: svc-sway 7s ease-in-out 1.2s infinite alternate;
 }
 
-/* Letters pop from flat to extruded one by one, then the word sways in depth */
+/* Letters pop from flat to extruded one by one, then the word sways in depth.
+   Strong ease-out (site ease vocabulary) — the depth shadow carries the pop;
+   overshoot easing read as toy-like. */
 .svc-extrude.lit .svc-ltr {
-  animation: svc-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: svc-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: calc(var(--i) * 45ms);
 }
 
@@ -491,8 +493,26 @@ body {
   pointer-events: none;
 }
 
-.magnetic-shine:hover::after {
-  transform: translateX(130%);
+/* hover-only: on touch, a tap would fire a stray one-off sweep */
+@media (hover: hover) {
+  .magnetic-shine:hover::after {
+    transform: translateX(130%);
+  }
+}
+
+/* Pressables: instant physical feedback on press. The independent `scale`
+   property (not transform) so it composes with GSAP x/y (MagneticButton)
+   and Tailwind translate utilities without clobbering them. The transition
+   lives in @layer base so Tailwind transition-* utilities (utilities layer)
+   win where present — those elements append `scale` to their own lists. */
+@layer base {
+  .press {
+    transition: scale 0.14s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+}
+
+.press:active {
+  scale: 0.97;
 }
 
 .loader-s {
@@ -515,5 +535,23 @@ body {
   }
   95% {
     opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-s {
+    animation: none;
+  }
+
+  .magnetic-shine::after {
+    display: none;
+  }
+
+  .press {
+    transition: none;
+  }
+
+  .press:active {
+    scale: none;
   }
 }

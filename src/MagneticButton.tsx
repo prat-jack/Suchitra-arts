@@ -33,7 +33,7 @@ export default function MagneticButton({
     <a
       ref={ref}
       href={href}
-      className={`magnetic-shine inline-block ${className}`}
+      className={`magnetic-shine press inline-block ${className}`}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
     >

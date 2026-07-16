@@ -34,7 +34,7 @@ export default function Nav({ visible }: { visible: boolean }) {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+        className={`fixed inset-x-0 top-0 z-50 transition-[opacity,transform,background-color,border-color,backdrop-filter] duration-500 ${
           solid
             ? 'border-b border-steel/50 bg-ink/90 backdrop-blur-md'
             : 'border-b border-transparent bg-gradient-to-b from-ink/80 to-transparent'
@@ -56,7 +56,7 @@ export default function Nav({ visible }: { visible: boolean }) {
             ))}
             <MagneticButton
               href="#contact"
-              className="rounded-sm bg-neon px-4 py-2 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-tungsten"
+              className="rounded-sm bg-neon px-4 py-2 text-sm font-semibold text-ink transition-[background-color,scale] [transition-duration:200ms,140ms] hover:bg-tungsten"
             >
               Get a quote
             </MagneticButton>
@@ -65,7 +65,7 @@ export default function Nav({ visible }: { visible: boolean }) {
               aria-label="Open menu"
               aria-expanded={open}
               onClick={() => setOpen(true)}
-              className="flex h-9 w-9 cursor-pointer flex-col items-center justify-center gap-[5px] md:hidden"
+              className="press flex h-11 w-11 cursor-pointer flex-col items-center justify-center gap-[5px] md:hidden"
             >
               <span className="block h-px w-5 bg-bone" />
               <span className="block h-px w-5 bg-bone" />
@@ -87,7 +87,7 @@ export default function Nav({ visible }: { visible: boolean }) {
             type="button"
             aria-label="Close menu"
             onClick={() => setOpen(false)}
-            className="flex h-9 w-9 cursor-pointer items-center justify-center font-mono text-lg text-putty"
+            className="press flex h-11 w-11 cursor-pointer items-center justify-center font-mono text-lg text-putty"
           >
             ✕
           </button>
@@ -98,7 +98,7 @@ export default function Nav({ visible }: { visible: boolean }) {
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className={`font-display text-4xl font-extrabold text-bone transition-all duration-500 ${
+              className={`font-display text-4xl font-extrabold text-bone transition-[opacity,transform] duration-500 ${
                 open ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
               }`}
               style={{ transitionDelay: open ? `${120 + i * 70}ms` : '0ms' }}
@@ -109,7 +109,7 @@ export default function Nav({ visible }: { visible: boolean }) {
           <a
             href="#contact"
             onClick={() => setOpen(false)}
-            className={`mt-4 inline-block w-fit rounded-sm bg-neon px-6 py-3 font-semibold text-ink transition-all duration-500 ${
+            className={`press mt-4 inline-block w-fit rounded-sm bg-neon px-6 py-3 font-semibold text-ink transition-[opacity,transform,scale] [transition-duration:500ms,500ms,140ms] ${
               open ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
             }`}
             style={{ transitionDelay: open ? '330ms' : '0ms' }}
@@ -117,7 +117,7 @@ export default function Nav({ visible }: { visible: boolean }) {
             Get a quote
           </a>
         </nav>
-        <p className="absolute bottom-8 left-6 font-mono text-[10px] tracking-[0.2em] text-putty/60">
+        <p className="absolute bottom-8 left-6 font-mono text-[10px] tracking-[0.2em] text-putty">
           FABRICATED IN BTM LAYOUT, BENGALURU
         </p>
       </div>

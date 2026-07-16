@@ -83,7 +83,7 @@ export default function About() {
               dark. If the sign we build you doesn't make you stop on the footpath and look up,
               we haven't finished.
             </p>
-            <p className="ab-reveal font-mono text-[10px] tracking-[0.2em] text-putty/70">
+            <p className="ab-reveal font-mono text-[10px] tracking-[0.2em] text-putty">
               DESIGN — FABRICATION — INSTALLATION · ALL UNDER ONE ROOF · BTM LAYOUT, BENGALURU
             </p>
           </div>

@@ -138,11 +138,22 @@ export default function Process() {
       })
       setActive(idx)
     }
+    // Coalesce to one measurement per frame — scroll can outpace rAF on
+    // some mobile browsers, and each pass reads four live rects
+    let raf = 0
+    const onScroll = () => {
+      if (raf) return
+      raf = requestAnimationFrame(() => {
+        raf = 0
+        updateActive()
+      })
+    }
     updateActive()
-    window.addEventListener('scroll', updateActive, { passive: true })
+    window.addEventListener('scroll', onScroll, { passive: true })
 
     return () => {
-      window.removeEventListener('scroll', updateActive)
+      cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', onScroll)
       ctx.revert()
     }
   }, [])
@@ -199,7 +210,7 @@ export default function Process() {
                 </h3>
                 <div className="proc-body mt-5 max-w-md">
                   <p className="text-sm leading-relaxed text-putty">{s.desc}</p>
-                  <p className="mt-4 font-mono text-[10px] tracking-[0.2em] text-putty/70">
+                  <p className="mt-4 font-mono text-[10px] tracking-[0.2em] text-putty">
                     {s.chip}
                   </p>
                 </div>

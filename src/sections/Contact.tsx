@@ -97,7 +97,7 @@ export default function Contact() {
   }
 
   const inputCls =
-    'w-full rounded-sm border border-steel bg-charcoal px-4 py-3 text-sm text-bone placeholder:text-putty/50 outline-none transition-colors duration-200 focus:border-tungsten'
+    'w-full rounded-sm border border-steel bg-charcoal px-4 py-3 text-sm text-bone placeholder:text-putty/85 outline-none transition-colors duration-200 focus:border-tungsten'
 
   return (
     <section ref={rootRef} id="contact" className="relative overflow-hidden bg-ink pt-28 md:pt-40">
@@ -131,13 +131,13 @@ export default function Contact() {
             <div className="ct-reveal flex flex-wrap items-center gap-5">
               <MagneticButton
                 href={`https://wa.me/${BIZ.whatsapp}?text=${waText()}`}
-                className="rounded-sm bg-neon px-7 py-4 font-semibold text-ink transition-colors duration-200 hover:bg-tungsten"
+                className="rounded-sm bg-neon px-7 py-4 font-semibold text-ink transition-[background-color,scale] [transition-duration:200ms,140ms] hover:bg-tungsten"
               >
                 WhatsApp us
               </MagneticButton>
               <a
                 href={`tel:${BIZ.phone.replace(/\s/g, '')}`}
-                className="rounded-sm border border-steel px-7 py-4 font-semibold text-bone transition-colors duration-200 hover:border-tungsten hover:text-tungsten"
+                className="press rounded-sm border border-steel px-7 py-4 font-semibold text-bone transition-colors duration-200 hover:border-tungsten hover:text-tungsten"
               >
                 Call {BIZ.phone}
               </a>
@@ -145,8 +145,8 @@ export default function Contact() {
 
             <dl className="ct-reveal grid max-w-md gap-6 font-mono text-[11px] tracking-[0.18em]">
               <div>
-                <dt className="text-putty/60">WORKSHOP</dt>
-                <dd className="mt-1 text-putty">
+                <dt className="text-putty">WORKSHOP</dt>
+                <dd className="mt-1 text-bone/90">
                   {BIZ.address.toUpperCase()}{' '}
                   <a
                     href={BIZ.mapsUrl}
@@ -159,15 +159,15 @@ export default function Contact() {
                 </dd>
               </div>
               <div>
-                <dt className="text-putty/60">HOURS</dt>
-                <dd className="mt-1 text-putty">{BIZ.hours}</dd>
+                <dt className="text-putty">HOURS</dt>
+                <dd className="mt-1 text-bone/90">{BIZ.hours}</dd>
               </div>
               <div>
-                <dt className="text-putty/60">EMAIL</dt>
+                <dt className="text-putty">EMAIL</dt>
                 <dd className="mt-1">
                   <a
                     href={`mailto:${BIZ.email}`}
-                    className="text-putty transition-colors duration-200 hover:text-bone"
+                    className="text-bone/90 transition-colors duration-200 hover:text-tungsten"
                   >
                     {BIZ.email.toUpperCase()}
                   </a>
@@ -180,34 +180,52 @@ export default function Contact() {
             <p className="font-mono text-[11px] tracking-[0.24em] text-putty">
               OR SEND US YOUR WALL
             </p>
-            <input
-              className={inputCls}
-              placeholder="Your name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              aria-label="Your name"
-            />
-            <input
-              className={inputCls}
-              placeholder="Phone number"
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              aria-label="Phone number"
-            />
-            <textarea
-              className={`${inputCls} min-h-28 resize-y`}
-              placeholder="What are we building? Shop name, rough size, where it's going…"
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-              aria-label="About the job"
-            />
+            <div className="flex flex-col gap-2">
+              <label htmlFor="ct-name" className="font-mono text-[11px] tracking-[0.18em] text-putty">
+                NAME
+              </label>
+              <input
+                id="ct-name"
+                className={inputCls}
+                placeholder="e.g. Meera"
+                autoComplete="name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="ct-phone" className="font-mono text-[11px] tracking-[0.18em] text-putty">
+                PHONE
+              </label>
+              <input
+                id="ct-phone"
+                type="tel"
+                className={inputCls}
+                placeholder="10-digit mobile"
+                autoComplete="tel"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="ct-job" className="font-mono text-[11px] tracking-[0.18em] text-putty">
+                ABOUT THE JOB
+              </label>
+              <textarea
+                id="ct-job"
+                className={`${inputCls} min-h-28 resize-y`}
+                placeholder="What are we building? Shop name, rough size, where it's going…"
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
+              />
+            </div>
             <button
               type="submit"
-              className="cursor-pointer rounded-sm border border-tungsten px-6 py-3 text-sm font-semibold text-tungsten transition-colors duration-200 hover:bg-tungsten hover:text-ink"
+              className="press cursor-pointer rounded-sm border border-tungsten px-6 py-3 text-sm font-semibold text-tungsten transition-[background-color,scale] [transition-duration:200ms,140ms] hover:bg-tungsten hover:text-ink"
             >
               Send via WhatsApp →
             </button>
-            <p className="text-xs leading-relaxed text-putty/50">
+            <p className="text-xs leading-relaxed text-putty">
               Opens WhatsApp with your details pre-filled — nothing is stored on this site.
             </p>
           </form>
@@ -219,10 +237,10 @@ export default function Contact() {
           <p className="font-display text-lg font-extrabold tracking-wide text-bone">
             SUCHITRA <span className="text-neon">ARTS</span>
           </p>
-          <p className="font-mono text-[10px] tracking-[0.2em] text-putty/60">
+          <p className="font-mono text-[10px] tracking-[0.2em] text-putty">
             FABRICATED IN BTM LAYOUT, BENGALURU — BUILT TO GLOW
           </p>
-          <p className="font-mono text-[10px] tracking-[0.2em] text-putty/60">
+          <p className="font-mono text-[10px] tracking-[0.2em] text-putty">
             © {new Date().getFullYear()} SUCHITRA ARTS
           </p>
         </div>

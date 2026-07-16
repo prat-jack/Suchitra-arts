@@ -225,7 +225,7 @@ export default function Services() {
 
                 <div className="svc-meta flex flex-col gap-4 pb-2">
                   <p className="text-sm leading-relaxed text-putty">{s.desc}</p>
-                  <p className="font-mono text-[10px] tracking-[0.2em] text-putty/70">
+                  <p className="font-mono text-[10px] tracking-[0.2em] text-putty">
                     {s.chips.join(' · ')}
                   </p>
                 </div>

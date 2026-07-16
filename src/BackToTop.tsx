@@ -35,7 +35,7 @@ export default function BackToTop() {
       type="button"
       onClick={toTop}
       aria-label="Back to top"
-      className={`fixed bottom-6 right-6 z-40 flex h-11 w-11 cursor-pointer items-center justify-center rounded-sm border border-steel bg-charcoal/85 font-mono text-base text-putty backdrop-blur-sm transition-all duration-300 hover:border-tungsten hover:text-tungsten md:bottom-8 md:right-8 ${
+      className={`press fixed bottom-6 right-6 z-40 flex h-11 w-11 cursor-pointer items-center justify-center rounded-sm border border-steel bg-charcoal/85 font-mono text-base text-putty backdrop-blur-sm transition-[opacity,transform,border-color,color,scale] [transition-duration:300ms,300ms,300ms,300ms,140ms] hover:border-tungsten hover:text-tungsten md:bottom-8 md:right-8 ${
         visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'
       }`}
     >

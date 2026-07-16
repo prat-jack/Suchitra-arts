@@ -137,7 +137,7 @@ export default function Work() {
                 <span className="font-display text-lg font-extrabold tracking-wide text-bone">
                   {w.title}
                 </span>
-                <span className="text-right font-mono text-[9px] tracking-[0.18em] text-putty/70">
+                <span className="text-right font-mono text-[10px] tracking-[0.18em] text-putty">
                   {w.chips}
                 </span>
               </figcaption>

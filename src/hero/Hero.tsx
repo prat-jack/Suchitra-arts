@@ -358,7 +358,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
         onClick={() =>
           gsap.to(window, { scrollTo: scrollEndRef.current, duration: 1.2, ease: 'power2.inOut' })
         }
-        className="pointer-events-none absolute right-6 top-6 cursor-pointer font-mono text-[11px] tracking-[0.2em] text-putty opacity-0 transition-colors duration-200 hover:text-bone md:right-12 md:top-10"
+        className="press pointer-events-none absolute right-6 top-6 -m-3.5 cursor-pointer p-3.5 font-mono text-[11px] tracking-[0.2em] text-putty opacity-0 transition-colors duration-200 hover:text-bone md:right-12 md:top-10"
         style={{ transition: 'opacity 0.4s, color 0.2s' }}
       >
         SKIP BUILD →
@@ -403,7 +403,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
         <div className="mt-6 flex items-center gap-5">
           <MagneticButton
             href="#contact"
-            className="rounded-sm bg-neon px-6 py-3 font-semibold text-ink transition-colors duration-200 hover:bg-tungsten"
+            className="rounded-sm bg-neon px-6 py-3 font-semibold text-ink transition-[background-color,scale] [transition-duration:200ms,140ms] hover:bg-tungsten"
           >
             Get a quote
           </MagneticButton>
@@ -420,7 +420,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
         type="button"
         onClick={toggleSound}
         aria-label={soundOn ? 'Turn sound off' : 'Turn sound on'}
-        className="absolute bottom-24 right-4 z-10 cursor-pointer font-mono text-[11px] tracking-[0.2em] text-putty transition-colors duration-200 hover:text-bone md:bottom-10 md:right-12"
+        className="press absolute bottom-24 right-4 z-10 -m-3.5 cursor-pointer p-3.5 font-mono text-[11px] tracking-[0.2em] text-putty transition-colors duration-200 hover:text-bone md:bottom-10 md:right-12"
       >
         SOUND — {soundOn ? 'ON' : 'OFF'}
       </button>
@@ -439,7 +439,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="mt-2 cursor-pointer rounded-sm border border-steel px-5 py-2 font-mono text-[11px] tracking-[0.2em] text-putty transition-colors duration-200 hover:border-tungsten hover:text-tungsten"
+            className="press mt-2 cursor-pointer rounded-sm border border-steel px-5 py-2.5 font-mono text-[11px] tracking-[0.2em] text-putty transition-colors duration-200 hover:border-tungsten hover:text-tungsten"
           >
             TAP TO RELOAD
           </button>
