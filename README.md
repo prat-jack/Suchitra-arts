@@ -117,16 +117,21 @@ blobs, plaster bump maps (canvas-generated), FPS governor (EMA < 45fps for 2s
 
 Device paths in `Hero.tsx`:
 - **Desktop:** pinned scrub (ScrollTrigger, scrub 1.1, anticipatePin, 4200px)
-- **Mobile** (`pointer: coarse` + <1024px), default: same timeline as a ~6s
-  autoplay cinematic — no pin, no scroll-jack; aspect-compensated FOV
-  (`computeFov`)
-- **Mobile, `?mobilescroll` flag** — EXPERIMENTAL, opt-in only: real
-  ScrollTrigger pin tuned for touch (3200px, scrub 0.6) with
-  `normalizeScroll(true)` + `config({ ignoreMobileResize: true })` for
-  mobile pin reliability. Default mobile path is untouched by this — see
-  `docs/mobile-scroll-experiment.md` for testing instructions and the
-  rollback plan (tag: `stable-mobile-cinematic-2026-07-12`).
+- **Mobile** (`pointer: coarse` + <1024px), **DEFAULT: real scroll-driven
+  pin** tuned for touch (3200px, scrub 0.6) with `normalizeScroll(true)` +
+  `config({ ignoreMobileResize: true })` for mobile pin reliability —
+  promoted from the `?mobilescroll` experiment 2026-07-17 after client
+  approval on a real phone. See `docs/mobile-scroll-experiment.md`
+  (rollback tag: `stable-mobile-cinematic-2026-07-12`).
+- **Mobile, `?mobilecinematic` flag** — escape hatch: the old ~6s autoplay
+  cinematic, no pin, no scroll-jack.
 - **prefers-reduced-motion:** static finished frame, everything visible
+- Narrow/portrait aspects: `computeFov` widens the vertical FOV so the sign
+  never crops, and `applyViewOffset` lifts the frame screen-space so the
+  sign's bottom row clears the headline block (client screenshot: "ARTS
+  touching the hero line"). Intro fade-ins (kicker, scroll cue) are created
+  per-path — a delayed global tween used to revive "SCROLL TO BUILD" over
+  the cinematic and reduced-motion end frames.
 - WebGL context loss → branded “POWER INTERRUPTED” overlay + tap-to-reload;
   auto-resume on restore
 
@@ -315,13 +320,15 @@ Prod check: `npm run build && npx vite preview`.
 | `e4a61aa` | Work gallery (CC0 prototype imagery), general About section, nav goes solid past the hero (fixes huge content colliding with the transparent header), Process sticky numeral now also on mobile |
 | `ae5a37b` | Gallery replaced with six self-rendered halo-lit concept signs (dev-only `StillSign` renderer, `?still=<id>`) after user found the CC0 photos weak; Process active-step detection moved from IO to a scroll listener (IO lagged/skipped under mobile momentum scrolling) |
 | `c71de73` | StillSign realism v2 (baked per-letter halo with occluded cores, contact shadows, IBL on letters, seamless weathered walls, camera roll) after client review "looks like art, I want realistic"; all six renders recaptured. Process numeral now flips on title-crossing, not block-edge ("number changes too early"). **Safety tag: `stable-photoreal-gallery-2026-07-17` (return point #2, deploy-verified)** |
-| *(pending)* | Design-skill compliance pass (spec + plan in `docs/superpowers/`): AA contrast (sub-4.5:1 `putty/50–70` raised), visible form labels replace placeholder-as-label, 44px touch targets (hamburger/close/skip/sound), `.press` active-scale feedback on all pressables (independent `scale` property, `@layer base` so Tailwind transition utilities compose), explicit transition property lists replace `transition-all`, extrude-pop bounce easing → strong ease-out, magnetic shine gated to hover-capable devices, loader flicker + shine + press disabled under reduced motion, Process scroll handler rAF-coalesced. Deliberate deviations (em-dash/kicker brand system, scroll listeners per invariant #7, elastic magnetic return, single dark theme) documented in the spec |
+| `218f900` | Design-skill compliance pass (spec + plan in `docs/superpowers/`): AA contrast (sub-4.5:1 `putty/50–70` raised), visible form labels replace placeholder-as-label, 44px touch targets (hamburger/close/skip/sound), `.press` active-scale feedback on all pressables (independent `scale` property, `@layer base` so Tailwind transition utilities compose), explicit transition property lists replace `transition-all`, extrude-pop bounce easing → strong ease-out, magnetic shine gated to hover-capable devices, loader flicker + shine + press disabled under reduced motion, Process scroll handler rAF-coalesced. Deliberate deviations (em-dash/kicker brand system, scroll listeners per invariant #7, elastic magnetic return, single dark theme) documented in the spec |
 
 ## Open items
 
-- [ ] Decide whether the mobile scroll experiment (`?mobilescroll`) becomes
-      the new default, stays opt-in, or gets reverted — needs real-phone
-      testing on iOS Safari + Android Chrome (see the doc's open questions)
+- [x] ~~Decide whether the mobile scroll experiment becomes the default~~ —
+      **promoted to default 2026-07-17** after client approval on a real
+      phone; `?mobilecinematic` is the autoplay escape hatch (see
+      `docs/mobile-scroll-experiment.md`; watch-list for iOS/Android quirks
+      still applies)
 - [ ] Swap `BIZ` placeholders in `Contact.tsx` + phone in `index.html` JSON-LD
 - [ ] **The Work**: replace the six concept renders in `public/work/` with
       real install photos (edit the `WORKS` array in `sections/Work.tsx`)

@@ -1,17 +1,16 @@
-# Mobile scroll-driven hero — experiment
+# Mobile scroll-driven hero
 
-**Status: experimental, opt-in only. Default mobile behavior is unchanged.**
+**Status: PROMOTED TO DEFAULT (2026-07-17).** The client tested the
+`?mobilescroll` trial on a real phone, approved it ("the mobile scroll
+effect was working really well"), and asked for it as the main experience.
+Scroll-driven is now what every mobile visitor gets; the old autoplay
+cinematic remains as an escape hatch.
 
-## What this is
+## The two mobile paths
 
-The default mobile hero (built earlier) plays the whole sign-building
-sequence as a ~6s autoplay animation with no scroll pin, because pinned
-scroll is unreliable on phone browsers — momentum scroll fights the pin,
-and iOS's collapsing address bar shifts viewport geometry mid-scroll.
-
-This experiment tries the real thing anyway: the same scroll-driven pin
-desktop uses, tuned for touch (shorter pin distance, snappier scrub) and
-hardened per GSAP's own mobile guidance:
+The default mobile hero is now the same scroll-driven pin desktop uses,
+tuned for touch (shorter pin distance, snappier scrub) and hardened per
+GSAP's own mobile guidance:
 
 - `ScrollTrigger.normalizeScroll(true)` — forces scroll onto the JS thread
   so pin updates stay in sync with paint, instead of fighting native
@@ -19,22 +18,16 @@ hardened per GSAP's own mobile guidance:
 - `ScrollTrigger.config({ ignoreMobileResize: true })` — stops iOS's
   address-bar show/hide from triggering a mid-scroll re-measure
 
-Both only activate when the experiment is active — they are global GSAP
-settings, but the code path that calls them only runs for opted-in mobile
-visitors, so no other visitor's scroll behavior is touched.
-
-## How to test it
-
-Append `?mobilescroll` to the live URL on an actual phone:
+The old ~6s autoplay cinematic is reachable via `?mobilecinematic`:
 
 ```
-https://prat-jack.github.io/Suchitra-arts/?mobilescroll
+https://prat-jack.github.io/Suchitra-arts/?mobilecinematic
 ```
 
-Without the flag, mobile visitors get the exact same autoplay cinematic as
-before — nothing about the default experience changed.
+The legacy `?mobilescroll` flag is redundant (scroll is the default) and
+simply ignored.
 
-(There's also a `?forcemobile` flag for testing the mobile branch from a
+(There's also a `?forcemobile` flag for testing the mobile branches from a
 desktop browser — but it only works in local dev builds; production builds
 statically strip it, so it has zero effect on the live site.)
 
@@ -44,43 +37,48 @@ All of it is in `src/hero/Hero.tsx`, in the branch selection inside the
 main `useEffect`:
 
 ```
-reducedMotion              → static lit frame (unchanged)
-isMobile && !mobileScrollFlag → autoplay cinematic (unchanged — default)
-everything else             → real ScrollTrigger pin
-                               (desktop: 4200px / scrub 1.1 — unchanged)
-                               (mobile+flag: 3200px / scrub 0.6 — NEW)
+reducedMotion                → static lit frame
+isMobile && mobileCinematic  → autoplay cinematic (?mobilecinematic)
+everything else              → real ScrollTrigger pin
+                               (desktop: 4200px / scrub 1.1)
+                               (mobile:  3200px / scrub 0.6 — DEFAULT)
 ```
+
+Related mobile-framing detail: on narrow/portrait viewports `SignScene`
+applies a screen-space `setViewOffset` lift so the sign's bottom row clears
+the headline block (client screenshot showed "ARTS" touching the headline).
 
 ## Rollback plan
 
-A tag marks the last commit before this experiment started:
+A tag marks the last commit before the scroll experiment started:
 
 ```
 stable-mobile-cinematic-2026-07-12
 ```
 
 It's pushed to `origin`, not just local — recoverable even from a fresh
-clone. If the experiment needs to be undone:
+clone. If scroll-by-default needs to be undone, the one-line soft revert is
+to flip the branch condition in `Hero.tsx` back to opt-in:
+
+```ts
+// current (scroll default):
+const mobileCinematic = isMobileEarly && params.has('mobilecinematic')
+// revert to cinematic default: make the cinematic branch the fallback
+// by changing `isMobile && mobileCinematic` to `isMobile && !params.has('mobilescroll')`
+```
+
+The full non-destructive git revert also still works:
 
 ```bash
 git revert --no-commit stable-mobile-cinematic-2026-07-12..HEAD -- src/hero/Hero.tsx
-git commit -m "Revert mobile scroll-driven hero experiment"
+git commit -m "Revert mobile scroll-driven hero"
 git push origin main
 ```
 
-This creates a new commit that undoes the change (non-destructive — no
-history is rewritten, no force-push). Since the experiment is entirely
-opt-in via URL flag, a simpler "soft revert" also works if the code should
-stay in place for later but be fully inert: delete this file and remove the
-`mobileScrollFlag` line in `Hero.tsx` so the flag can never be true.
+## Watch-list on real hardware
 
-## Open questions to resolve before promoting this to default
-
-- Does it actually feel good on real hardware — no jank, no jump when the
-  pin engages/releases, no address-bar fighting?
-- Is 3200px the right pin distance for a phone swipe, or should it be
-  shorter/longer?
-- Does `normalizeScroll` cause any friction with normal (non-hero) page
-  scrolling once it's active for the rest of the session?
-- Test on both iOS Safari and Android Chrome — they diverge most on exactly
-  the address-bar/viewport behavior this experiment is trying to tame.
+- No jank or jump when the pin engages/releases; no address-bar fighting.
+- Whether 3200px stays the right pin distance for a phone swipe.
+- Whether `normalizeScroll` causes friction with normal page scrolling for
+  the rest of the session (it stays active after the hero).
+- iOS Safari vs Android Chrome divergence on address-bar/viewport behavior.

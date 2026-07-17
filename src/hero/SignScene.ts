@@ -143,6 +143,7 @@ export class SignScene {
 
     this.camera = new THREE.PerspectiveCamera(computeFov(w / h), w / h, 0.1, 60)
     this.camera.position.set(0, 1.4, 7.6)
+    this.applyViewOffset(w, h)
 
     const target = new THREE.WebGLRenderTarget(w, h, {
       samples: 4,
@@ -935,10 +936,26 @@ export class SignScene {
     this.composer.render()
   }
 
+  /** On narrow/portrait viewports the headline block overlays the lower
+   *  third of the canvas, and the sign's bottom row sat right against it
+   *  (client screenshot: "ARTS is touching the hero line"). A screen-space
+   *  view offset lifts the whole frame — the timeline-owned camera position
+   *  and every scrub keyframe stay untouched. */
+  private applyViewOffset(w: number, h: number): void {
+    const aspect = w / h
+    if (aspect < 0.75) {
+      const shift = h * 0.09 * Math.min(1, (0.75 - aspect) / 0.3)
+      this.camera.setViewOffset(w, h, 0, shift, w, h)
+    } else {
+      this.camera.clearViewOffset()
+    }
+    this.camera.updateProjectionMatrix()
+  }
+
   resize(w: number, h: number): void {
     this.camera.aspect = w / h
     this.camera.fov = computeFov(w / h)
-    this.camera.updateProjectionMatrix()
+    this.applyViewOffset(w, h)
     this.renderer.setSize(w, h, false)
     this.composer.setSize(w, h)
     this.bloomPass.resolution.set(w, h)

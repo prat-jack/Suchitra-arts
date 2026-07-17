@@ -82,12 +82,13 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
     const isMobileEarly =
       forceMobileDev ||
       (window.matchMedia('(pointer: coarse)').matches && window.innerWidth < 1024)
-    // EXPERIMENTAL, opt-in only: real scroll-driven pin on mobile instead of
-    // the default autoplay cinematic. Gated behind a URL flag so every mobile
-    // visitor who doesn't know this flag exists — including anyone reopening
-    // a link already shared — gets the untouched, known-good cinematic path.
-    // See docs/mobile-scroll-experiment.md for the rollback plan.
-    const mobileScrollFlag = isMobileEarly && params.has('mobilescroll')
+    // The scroll-driven pin is now the mobile DEFAULT — the client approved
+    // the ?mobilescroll trial on a real phone and asked for it as the main
+    // experience. ?mobilecinematic restores the old ~6s autoplay cinematic
+    // (kept as an escape hatch; docs/mobile-scroll-experiment.md has the full
+    // rollback plan and the safety tag). The legacy ?mobilescroll flag is
+    // simply redundant now.
+    const mobileCinematic = isMobileEarly && params.has('mobilecinematic')
 
     const scene = new SignScene(canvas, reducedMotionEarly || isMobileEarly)
     sceneRef.current = scene
@@ -114,8 +115,17 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
       tl = gsap.timeline({ paused: true })
       scene.buildTimeline(tl)
 
-      gsap.to(kickerRef.current, { opacity: 1, y: 0, duration: 1.4, delay: 1.6, ease: 'power2.out' })
-      gsap.to(cueRef.current, { opacity: 1, duration: 1.2, delay: 2.4 })
+      // Intro fade-ins only where they belong: reduced-motion snaps to the
+      // end frame (a delayed fade-in would revive these over it), and the
+      // cinematic path must never show "SCROLL TO BUILD" — scrolling doesn't
+      // build there. This delayed tween reviving the cue over the cinematic's
+      // end frame was a real client-reported overlap bug.
+      if (!reducedMotion) {
+        gsap.to(kickerRef.current, { opacity: 1, y: 0, duration: 1.4, delay: 1.6, ease: 'power2.out' })
+        if (!(isMobile && mobileCinematic)) {
+          gsap.to(cueRef.current, { opacity: 1, duration: 1.2, delay: 2.4 })
+        }
+      }
 
       tl.to(cueRef.current, { opacity: 0, duration: 3 }, 6)
       tl.to(kickerRef.current, { opacity: 0, y: -10, duration: 3 }, 60)
@@ -215,8 +225,8 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
         gsap.set([kickerRef.current, cueRef.current, stageRef.current, skipRef.current], { opacity: 0 })
         gsap.set(headlineRef.current, { opacity: 1, y: 0 })
         gsap.set([line1Ref.current, line2Ref.current], { yPercent: 0 })
-      } else if (isMobile && !mobileScrollFlag) {
-        // DEFAULT mobile path, untouched — phones get the story as a ~6s
+      } else if (isMobile && mobileCinematic) {
+        // Escape-hatch mobile path (?mobilecinematic) — the story as a ~6s
         // autoplay cinematic. No pin, no scroll-jacking.
         gsap.set([cueRef.current, stageRef.current, skipRef.current], { opacity: 0 })
         tl.timeScale(100 / 6)
@@ -228,8 +238,8 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
         tl.eventCallback('onComplete', () => scene.setIdle(true))
         gsap.delayedCall(1.5, () => tl?.play())
       } else {
-        // Real scroll-driven pin. Always used on desktop; on mobile it only
-        // runs when mobileScrollFlag opted in (see flag comment above).
+        // Real scroll-driven pin — desktop always, and now the mobile
+        // default too (see flag comment above).
         // Pinning fights native touch scroll by default on phones — this
         // path additionally normalizes touch scroll onto the JS thread and
         // ignores iOS address-bar resize events, per GSAP's own guidance for
@@ -420,7 +430,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
         type="button"
         onClick={toggleSound}
         aria-label={soundOn ? 'Turn sound off' : 'Turn sound on'}
-        className="press absolute bottom-24 right-4 z-10 -m-3.5 cursor-pointer p-3.5 font-mono text-[11px] tracking-[0.2em] text-putty transition-colors duration-200 hover:text-bone md:bottom-10 md:right-12"
+        className="press absolute right-6 top-[4.6rem] z-10 -m-3.5 cursor-pointer p-3.5 font-mono text-[11px] tracking-[0.2em] text-putty transition-colors duration-200 hover:text-bone md:bottom-10 md:right-12 md:top-auto"
       >
         SOUND — {soundOn ? 'ON' : 'OFF'}
       </button>
