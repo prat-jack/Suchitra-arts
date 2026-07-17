@@ -23,8 +23,11 @@ letters into lit 3D channel letters.
 | Styling    | Tailwind CSS v4 (CSS-first config in `index.css`)   | Design tokens as `@theme` variables |
 | 3D         | Three.js r185, **plain** (not react-three-fiber)    | Full control of scene graph + render loop |
 | Animation  | GSAP 3.15 + ScrollTrigger + ScrollToPlugin          | Scrubbed timelines pinned to scroll |
-| Audio      | Hand-rolled WebAudio (`SoundKit.ts`)                | 100% procedural — zero audio assets |
 | Deploy     | GitHub Actions → GitHub Pages                       | Self-enabling workflow, free hosting |
+
+(The procedural WebAudio sound kit was removed 2026-07-18 at the client's
+request — off-by-default audio wasn't earning its UI footprint. History has
+it at `8209ab9` and earlier if it's ever wanted back.)
 
 No other runtime dependencies. Bundle ≈ 269 KB gzip (mostly three.js).
 
@@ -81,9 +84,8 @@ sections/
   Process.tsx    “How we work” sticky job-card index
   Contact.tsx    WhatsApp-first conversion + footer  ← BIZ placeholder block here
 hero/
-  Hero.tsx       React shell: ScrollTrigger pin, HUD, sound wiring, loader, overlays
+  Hero.tsx       React shell: ScrollTrigger pin, HUD, loader, overlays
   SignScene.ts   The entire Three.js world + scrubbed timeline choreography
-  SoundKit.ts    Procedural audio: lamp buzz, neon hum, winch, clunks, thunk, spark
   letters.ts     TextGeometry channel letters (LED emissiveMap, trim-cap bevels)
   palette.ts     Hex constants for the scene
 ```
@@ -104,9 +106,9 @@ Storyboard on the scrubbed timeline (duration units = % of scroll):
 | 80–100  | Rig strikes upward offscreen, camera settles, headline mask-reveal, CTA |
 | idle    | Glow breathing, H-tube blink (~8s), cursor parallax + per-letter proximity glow, museum drift after 14s idle, floor reflection fades in |
 
-Interactive: **click the breaker** to kill/relight the sign (raycast; sound
-thunk; scroll re-entry restores timeline state). HUD: scramble-decode build
-captions (`01 — LAYOUT … 04 — POWER ON`), `SKIP BUILD →`, sound toggle.
+Interactive: **click the breaker** to kill/relight the sign (raycast;
+scroll re-entry restores timeline state). HUD: scramble-decode build
+captions (`01 — LAYOUT … 04 — POWER ON`), `SKIP BUILD →`.
 
 Rendering: ACES tonemapping, UnrealBloom (strength .3 / radius .22 /
 threshold .75), film grain + vignette ShaderPass (ends with
@@ -321,6 +323,8 @@ Prod check: `npm run build && npx vite preview`.
 | `ae5a37b` | Gallery replaced with six self-rendered halo-lit concept signs (dev-only `StillSign` renderer, `?still=<id>`) after user found the CC0 photos weak; Process active-step detection moved from IO to a scroll listener (IO lagged/skipped under mobile momentum scrolling) |
 | `c71de73` | StillSign realism v2 (baked per-letter halo with occluded cores, contact shadows, IBL on letters, seamless weathered walls, camera roll) after client review "looks like art, I want realistic"; all six renders recaptured. Process numeral now flips on title-crossing, not block-edge ("number changes too early"). **Safety tag: `stable-photoreal-gallery-2026-07-17` (return point #2, deploy-verified)** |
 | `218f900` | Design-skill compliance pass (spec + plan in `docs/superpowers/`): AA contrast (sub-4.5:1 `putty/50–70` raised), visible form labels replace placeholder-as-label, 44px touch targets (hamburger/close/skip/sound), `.press` active-scale feedback on all pressables (independent `scale` property, `@layer base` so Tailwind transition utilities compose), explicit transition property lists replace `transition-all`, extrude-pop bounce easing → strong ease-out, magnetic shine gated to hover-capable devices, loader flicker + shine + press disabled under reduced motion, Process scroll handler rAF-coalesced. Deliberate deviations (em-dash/kicker brand system, scroll listeners per invariant #7, elastic magnetic return, single dark theme) documented in the spec |
+| `8209ab9` | Mobile hero scroll-driven **by default** (client approved the trial on a real phone); `?mobilecinematic` escape hatch. End-frame overlap fixes from client screenshot: portrait `setViewOffset` lift (sign clears headline), per-path intro fade-ins (killed the "SCROLL TO BUILD" revival over cinematic/reduced-motion end frames), sound toggle moved top-right on mobile |
+| *(pending)* | Sound feature removed entirely at client request ("not adding value") — `SoundKit.ts` deleted, `updateSound` → `updateFx` (camera shakes on letter contacts + snap preserved), toggle button gone. Recoverable from history at `8209ab9` |
 
 ## Open items
 

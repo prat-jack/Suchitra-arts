@@ -3,7 +3,6 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
 import { SignScene } from './SignScene'
-import { SoundKit } from './SoundKit'
 import MagneticButton from '../MagneticButton'
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
@@ -26,7 +25,6 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
   const stageBarRef = useRef<HTMLSpanElement>(null)
   const skipRef = useRef<HTMLButtonElement>(null)
   const scrollEndRef = useRef(0)
-  const soundRef = useRef<SoundKit | null>(null)
   const sceneRef = useRef<SignScene | null>(null)
   const prevProgressRef = useRef(0)
   const line1Ref = useRef<HTMLSpanElement>(null)
@@ -35,21 +33,6 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
   const scrambleTweenRef = useRef<gsap.core.Tween | null>(null)
   const [ready, setReady] = useState(false)
   const [ctxLost, setCtxLost] = useState(false)
-  const [soundOn, setSoundOn] = useState(false)
-
-  const toggleSound = () => {
-    if (!soundRef.current) soundRef.current = new SoundKit()
-    const sound = soundRef.current
-    const scene = sceneRef.current
-    if (soundOn) {
-      sound.disable()
-      setSoundOn(false)
-    } else {
-      sound.enable()
-      if (scene && prevProgressRef.current > 0.79 && scene.isSignOn) sound.setNeonOn(true)
-      setSoundOn(true)
-    }
-  }
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -148,28 +131,15 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
         88.4,
       )
 
-      const updateSound = (progress: number, velocity: number) => {
-        const sound = soundRef.current
+      // Impact feedback on threshold crossings: a small camera shake when a
+      // letter meets the wall, a bigger one at the snap. (This used to also
+      // drive the procedural sound kit — removed as not earning its keep.)
+      const updateFx = (progress: number) => {
         const prev = prevProgressRef.current
         for (const c of scene.contactProgresses) {
-          if (prev < c && progress >= c) {
-            scene.triggerShake(0.005)
-            sound?.isEnabled && sound.clunk()
-          }
+          if (prev < c && progress >= c) scene.triggerShake(0.005)
         }
-        if (prev < 0.72 && progress >= 0.72) {
-          scene.triggerShake(0.014)
-          if (sound?.isEnabled) {
-            sound.thunk()
-            sound.spark()
-          }
-        }
-        if (sound?.isEnabled) {
-          if (prev < 0.79 && progress >= 0.79) sound.setNeonOn(true)
-          if (prev >= 0.744 && progress < 0.744) sound.setNeonOn(false)
-          const mounting = progress > 0.095 && progress < 0.64
-          sound.setWinch(mounting ? Math.min(0.13, Math.abs(velocity) / 7000) : 0)
-        }
+        if (prev < 0.72 && progress >= 0.72) scene.triggerShake(0.014)
         prevProgressRef.current = progress
       }
 
@@ -233,7 +203,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
         tl.eventCallback('onUpdate', () => {
           const p = tl!.progress()
           onNavChange?.(p > 0.8)
-          updateSound(p, 2600)
+          updateFx(p)
         })
         tl.eventCallback('onComplete', () => scene.setIdle(true))
         gsap.delayedCall(1.5, () => tl?.play())
@@ -260,7 +230,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
           onUpdate: (self) => {
             scene.setIdle(self.progress > 0.97)
             updateHud(self.progress)
-            updateSound(self.progress, self.getVelocity())
+            updateFx(self.progress)
           },
         }))
         tl.eventCallback('onComplete', () => scene.setIdle(true))
@@ -293,18 +263,7 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
       }
       onClick = (e) => {
         const [x, y] = toNdc(e)
-        if (scene.tryToggle(x, y)) {
-          const sound = soundRef.current
-          if (sound?.isEnabled) {
-            sound.thunk()
-            if (scene.isSignOn) {
-              sound.spark()
-              gsap.delayedCall(0.6, () => sound.setNeonOn(scene.isSignOn))
-            } else {
-              sound.setNeonOn(false)
-            }
-          }
-        }
+        scene.tryToggle(x, y)
       }
       canvas.addEventListener('pointermove', onMove)
       canvas.addEventListener('click', onClick as EventListener)
@@ -325,8 +284,6 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
       heroSt?.kill()
       scrollNormalizer?.kill()
       tl?.kill()
-      soundRef.current?.dispose()
-      soundRef.current = null
       scene.dispose()
     }
   }, [])
@@ -426,14 +383,6 @@ export default function Hero({ onNavChange }: { onNavChange?: (visible: boolean)
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={toggleSound}
-        aria-label={soundOn ? 'Turn sound off' : 'Turn sound on'}
-        className="press absolute right-6 top-[4.6rem] z-10 -m-3.5 cursor-pointer p-3.5 font-mono text-[11px] tracking-[0.2em] text-putty transition-colors duration-200 hover:text-bone md:bottom-10 md:right-12 md:top-auto"
-      >
-        SOUND — {soundOn ? 'ON' : 'OFF'}
-      </button>
       </div>
 
       <div
