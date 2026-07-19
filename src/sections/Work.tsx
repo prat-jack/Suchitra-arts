@@ -17,40 +17,40 @@ interface WorkItem {
 
 const WORKS: WorkItem[] = [
   {
-    src: 'work/render-kanaka.jpg',
-    alt: 'Concept render: KANAKA & CO in halo-lit brass serif letters on dark stone',
-    title: 'KANAKA & CO',
-    chips: 'REVERSE-LIT BRASS · STONE',
+    src: 'work/render-sunday.jpg',
+    alt: 'Concept render: second sunday in cream skeleton-script letters casting a hard sun shadow on ribbed sage cladding',
+    title: 'SECOND SUNDAY',
+    chips: 'SKELETON SCRIPT · RIBBED STEEL',
   },
   {
-    src: 'work/render-marigold.jpg',
-    alt: 'Concept render: MARIGOLD CAFE & BAKERY, two-line halo letters on warm plaster',
-    title: 'MARIGOLD',
-    chips: 'HALO LETTERS · WARM PLASTER',
+    src: 'work/render-hen.jpg',
+    alt: 'Concept render: HEN HOUSE in red letters on a black roundel with a cream ring, mounted on brick at night',
+    title: 'HEN HOUSE',
+    chips: 'PANEL ROUNDEL · BRICK',
   },
   {
-    src: 'work/render-basava.jpg',
-    alt: 'Concept render: BASAVA SILKS in bold gold letters with amber halo on charcoal',
-    title: 'BASAVA SILKS',
-    chips: 'GOLD STEEL · AMBER HALO',
+    src: 'work/render-malabar.jpg',
+    alt: 'Concept render: malabar in deep green retro script channel letters on warm pink plaster',
+    title: 'MALABAR',
+    chips: 'CHANNEL SCRIPT · PINK PLASTER',
   },
   {
-    src: 'work/render-bakehouse.jpg',
-    alt: 'Concept render: THE BAKEHOUSE in dark letters with cream halo on exposed brick',
-    title: 'THE BAKEHOUSE',
-    chips: 'HALO LETTERS · EXPOSED BRICK',
+    src: 'work/render-biryani.jpg',
+    alt: 'Concept render: THE BIRYANI ROOM stencil-cut into a dark roundel, warm light bleeding through and around it onto brick',
+    title: 'THE BIRYANI ROOM',
+    chips: 'BACKLIT STENCIL · ROUNDEL',
   },
   {
-    src: 'work/render-veda.jpg',
-    alt: 'Concept render: VEDA WELLNESS SPA in serif letters with a cool halo on plaster',
-    title: 'VEDA WELLNESS',
-    chips: 'SATIN STEEL · COOL HALO',
+    src: 'work/render-kala.jpg',
+    alt: 'Concept render: KALA HOUSE in teal dimensional letters over a yellow painted ghost print on whitewashed planks',
+    title: 'KALA HOUSE',
+    chips: 'GHOST PRINT · TIMBER',
   },
   {
-    src: 'work/render-cubbon.jpg',
-    alt: 'Concept render: CUBBON HOUSE in brass serif letters with amber halo on stone',
-    title: 'CUBBON HOUSE',
-    chips: 'SERIF BRASS · AMBER HALO',
+    src: 'work/render-kaapi.jpg',
+    alt: 'Concept render: filter kaapi in warm white neon script tubes on a dark plaque over subway tile',
+    title: 'FILTER KAAPI',
+    chips: 'NEON SCRIPT · SUBWAY TILE',
   },
 ]
 
@@ -110,8 +110,8 @@ export default function Work() {
           THE WORK — SIGNS OUT THE DOOR
         </p>
         <p className="mt-4 max-w-md text-sm leading-relaxed text-putty">
-          The looks we build most — reverse-lit brass, halo letters, backlit fascias — shown the
-          way they read after dark.
+          The looks we build most — script channel letters, painted-and-mounted double prints,
+          backlit roundels, neon tube work — in daylight and after dark.
         </p>
         <p className="mt-3 font-mono text-[10px] tracking-[0.2em] text-tungsten/80">
           STUDIO CONCEPT RENDERS — INSTALL PHOTOGRAPHS TO FOLLOW

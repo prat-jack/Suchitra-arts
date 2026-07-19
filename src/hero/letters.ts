@@ -97,6 +97,10 @@ export interface StillRowSpec {
   size: number
   /** letter gap as a fraction of size (default 0.16) */
   track?: number
+  /** build the whole row as ONE TextGeometry — required for cursive/script
+   *  fonts, whose letters connect through glyph advances; per-character
+   *  placement severs the joins */
+  whole?: boolean
 }
 
 export interface StillRow {
@@ -122,7 +126,29 @@ export function buildStillRows(
   const rowGap = rows[0].size * 0.42
   const built: { meshes: THREE.Mesh[]; xs: number[]; widths: number[]; size: number }[] = []
 
+  const geomOpts = (size: number) => ({
+    font,
+    size,
+    depth,
+    curveSegments: 10,
+    bevelEnabled: true,
+    bevelThickness: 0.008,
+    bevelSize: 0.006,
+    bevelSegments: 2,
+  })
+
   for (const row of rows) {
+    if (row.whole) {
+      const geometry = new TextGeometry(row.text, geomOpts(row.size))
+      geometry.computeBoundingBox()
+      const bb = geometry.boundingBox!
+      const w = bb.max.x - bb.min.x
+      const h = bb.max.y - bb.min.y
+      geometry.translate(-bb.min.x - w / 2, -bb.min.y - h / 2, -bb.min.z)
+      const mesh = new THREE.Mesh(geometry, [faceMat, sideMat])
+      built.push({ meshes: [mesh], xs: [0], widths: [w], size: row.size })
+      continue
+    }
     const gap = row.size * (row.track ?? 0.16)
     const meshes: THREE.Mesh[] = []
     const widths: number[] = []
@@ -133,16 +159,7 @@ export function buildStillRows(
         cursor += row.size * 0.42
         continue
       }
-      const geometry = new TextGeometry(ch, {
-        font,
-        size: row.size,
-        depth,
-        curveSegments: 10,
-        bevelEnabled: true,
-        bevelThickness: 0.008,
-        bevelSize: 0.006,
-        bevelSegments: 2,
-      })
+      const geometry = new TextGeometry(ch, geomOpts(row.size))
       geometry.computeBoundingBox()
       const bb = geometry.boundingBox!
       const w = bb.max.x - bb.min.x

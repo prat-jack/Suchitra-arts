@@ -174,12 +174,17 @@ mobile too (76px column, 3.4rem numeral, sticky below the solid nav).
 Uniform 16:10 grid (`sections/Work.tsx`) of six signage images with job-card
 captions. Tiles rest dimmed/desaturated and light up in the reading band
 (IO adds `.lit`) — same unlit→lit language as Services. **All six images are
-our own concept renders** — fictional Indian marques (KANAKA & CO, MARIGOLD,
-BASAVA SILKS, THE BAKEHOUSE, VEDA WELLNESS, CUBBON HOUSE) in the halo-lit
-reverse-channel style of premium café/boutique signage, rendered by the
-dev-only `StillSign` renderer (below). Files in `public/work/render-*.jpg`;
-swap the `WORKS` array entries for real install photos when Samuel provides
-them. A tungsten disclaimer line says "STUDIO CONCEPT RENDERS".
+our own concept renders** — fictional Indian marques re-creating six
+client-supplied reference photos (which were real brands' signs and other
+people's photographs, unusable directly — trademark/false-attribution risk
+explained to and accepted by the client): SECOND SUNDAY (day skeleton script
+on ribbed steel), HEN HOUSE (night panel roundel on brick), MALABAR (day
+retro channel script on pink plaster), THE BIRYANI ROOM (night backlit
+stencil roundel), KALA HOUSE (day double-print ghost on timber), FILTER
+KAAPI (night neon script plaque on subway tile). Rendered by the dev-only
+`StillSign` renderer (below). Files in `public/work/render-*.jpg`; swap the
+`WORKS` array entries for real install photos when Samuel provides them.
+A tungsten disclaimer line says "STUDIO CONCEPT RENDERS".
 Tile `<img>`s are `aspect-[16/10]` to match the renders — fixed-height
 `object-cover` would crop letter edges off the wide signs.
 
@@ -212,10 +217,23 @@ after client feedback "looks like art, I want realistic"):
   `fit` bias, plus slight `roll` (degrees) for a candid handheld frame.
 - Grain runs at half the hero's strength (a still reads noisier than motion).
 
+v3 additions (reference-photo set): `mode: 'day'` (sun DirectionalLight with
+2048px shadows, no halo rig, exposure 1.04 — cream faces blow out above
+that); new seamless walls `ribbed`/`planks`/`tile` + tintable `plaster`
+(tint the speckle toward the base hue or it reads brown); `panel`
+(disc/round-rect plaque behind letters, matte black), `spill` (radial edge
+bleed + warm pool light below), `bakeOnPanel` (halo baked onto the plaque
+face — the neon-on-plaque look; raw bloom melted monoline script),
+`ghost` (silhouette → luminance-to-alpha painted echo, offset like an old
+coat — composite ops alone can't make alpha from an opaque canvas), and
+**whole-row TextGeometry** (`whole: true` in letters.ts) — cursive scripts
+connect through glyph advances; per-character placement severs the joins.
+
 Configs live in the `STILLS` record
-(`?still=kanaka|marigold|basava|bakehouse|veda|cubbon`). Fonts for it:
-`public/fonts/PlayfairDisplay-Bold.ttf`, `Poppins-SemiBold.ttf` (fetched only
-in DEV). Capture at 1600×1000, save to `public/work/render-<id>.jpg`.
+(`?still=sunday|malabar|kala|hen|biryani|kaapi`). Fonts (fetched only in
+DEV): Pacifico, Yellowtail, Sacramento, AllertaStencil, Poppins, plus the
+hero's BigShoulders. Capture at 1600×1000, save to
+`public/work/render-<id>.jpg`.
 
 ### About — the workshop (id="about")
 
@@ -324,7 +342,8 @@ Prod check: `npm run build && npx vite preview`.
 | `c71de73` | StillSign realism v2 (baked per-letter halo with occluded cores, contact shadows, IBL on letters, seamless weathered walls, camera roll) after client review "looks like art, I want realistic"; all six renders recaptured. Process numeral now flips on title-crossing, not block-edge ("number changes too early"). **Safety tag: `stable-photoreal-gallery-2026-07-17` (return point #2, deploy-verified)** |
 | `218f900` | Design-skill compliance pass (spec + plan in `docs/superpowers/`): AA contrast (sub-4.5:1 `putty/50–70` raised), visible form labels replace placeholder-as-label, 44px touch targets (hamburger/close/skip/sound), `.press` active-scale feedback on all pressables (independent `scale` property, `@layer base` so Tailwind transition utilities compose), explicit transition property lists replace `transition-all`, extrude-pop bounce easing → strong ease-out, magnetic shine gated to hover-capable devices, loader flicker + shine + press disabled under reduced motion, Process scroll handler rAF-coalesced. Deliberate deviations (em-dash/kicker brand system, scroll listeners per invariant #7, elastic magnetic return, single dark theme) documented in the spec |
 | `8209ab9` | Mobile hero scroll-driven **by default** (client approved the trial on a real phone); `?mobilecinematic` escape hatch. End-frame overlap fixes from client screenshot: portrait `setViewOffset` lift (sign clears headline), per-path intro fade-ins (killed the "SCROLL TO BUILD" revival over cinematic/reduced-motion end frames), sound toggle moved top-right on mobile |
-| *(pending)* | Sound feature removed entirely at client request ("not adding value") — `SoundKit.ts` deleted, `updateSound` → `updateFx` (camera shakes on letter contacts + snap preserved), toggle button gone. Recoverable from history at `8209ab9` |
+| `1a43c59` | Sound feature removed entirely at client request ("not adding value") — `SoundKit.ts` deleted, `updateSound` → `updateFx` (camera shakes on letter contacts + snap preserved), toggle button gone. Recoverable from history at `8209ab9` |
+| *(pending)* | Gallery v3: client supplied six reference photos (thrift-shop script, Capri, wireframe-on-wood, Nando's, stencil roundel, Goddess neon) — re-rendered as our own fictional marques after flagging trademark/false-attribution and photo-copyright risk (client chose "render these styles ourselves"). StillSign v3: day mode, ribbed/planks/tile walls, panels, spill, bakeOnPanel, painted ghost, whole-row TextGeometry for cursive scripts. New set: sunday/hen/malabar/biryani/kala/kaapi |
 
 ## Open items
 
